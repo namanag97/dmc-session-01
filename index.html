@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Decision Makers Club</title>
+<style>
+  @font-face { font-family: Geist; src: url("./assets/Geist-Regular.woff2") format("woff2"); font-weight: 400; }
+  @font-face { font-family: Geist; src: url("./assets/Geist-Bold.woff2") format("woff2"); font-weight: 700; }
+  @font-face { font-family: "Geist Mono"; src: url("./assets/GeistMono-SemiBold.woff2") format("woff2"); font-weight: 600; }
+  :root {
+    --paper:#faf8f4; --ink:#1c1a17; --soft:#6e675e; --rule:#e4dfd6; --tint:#f1ede6; --accent:#a4502b;
+    --sans: Geist, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --mono: "Geist Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+  body { font: 400 19px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  .hidden { display: none !important; }
+  .k { font: 600 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--soft); }
+
+  .brand { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; padding: 22px 40px; font: 600 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--soft); pointer-events: none; z-index: 2; }
+  .brand span:first-child { color: var(--ink); }
+  .brand a { pointer-events: auto; text-decoration: none; }
+
+  .screen { min-height: 100vh; display: none; place-items: center; padding: 96px 40px 64px; }
+  .screen.on { display: grid; }
+  .screen > div { width: min(640px, 100%); }
+  .fade { animation: fade .6s ease both; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  h1, h2 { font-family: var(--serif); font-weight: 400; letter-spacing: -.01em; margin: 0; }
+  h1 { font-size: 52px; line-height: 1.08; }
+  h2 { font-size: 40px; line-height: 1.12; }
+  .lede { font-size: 20px; color: var(--soft); margin: 18px 0 0; }
+
+  .btn { font: 400 17px/1 var(--sans); background: var(--ink); color: var(--paper); border: 0; border-radius: 999px; padding: 18px 30px; cursor: pointer; text-decoration: none; display: inline-block; }
+  .btn:hover { background: var(--accent); }
+  .btn.quiet { background: none; color: var(--ink); border: 1px solid var(--ink); }
+  .btn.quiet:hover { border-color: var(--accent); color: var(--accent); background: none; }
+  .row { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-top: 40px; }
+  .back { background: none; border: 0; font: 400 16px/1 var(--sans); color: var(--soft); cursor: pointer; padding: 0; }
+  .back:hover { color: var(--ink); }
+
+  /* Landing */
+  form.table { margin-top: 40px; display: flex; gap: 14px; align-items: center; }
+  form.table input { font: 400 52px/1 var(--serif); width: 160px; padding: 10px 0; border: 0; border-bottom: 2px solid var(--ink); background: none; text-align: center; }
+  form.table input:focus { outline: none; border-color: var(--accent); }
+  form.table input::placeholder { color: var(--rule); }
+
+  /* CEO message */
+  #ceo > div { width: min(760px, 100%); }
+  .msg .from { display: flex; gap: 14px; align-items: center; margin-bottom: 18px; }
+  .msg .av { width: 48px; height: 48px; border-radius: 50%; background: var(--ink); color: var(--paper); display: grid; place-items: center; font: 600 14px/1 var(--mono); letter-spacing: .04em; }
+  .msg .from b { display: block; font-size: 18px; }
+  .msg .from > div > span { display: block; font-size: 15px; color: var(--soft); }
+  .msg .bubble { background: #fff; border: 1px solid var(--rule); border-radius: 22px 22px 22px 6px; padding: 34px 40px; box-shadow: 0 1px 2px rgba(28,26,23,.04), 0 12px 40px -20px rgba(28,26,23,.25); }
+  .msg .bubble p { margin: 0; font-family: var(--serif); font-size: 40px; line-height: 1.22; letter-spacing: -.01em; }
+  #ceo .row { min-height: 54px; margin-top: 30px; }
+  #ceo .row .btn { animation: fade .6s ease both; }
+  #guide details .msg .bubble p { font-size: 22px; line-height: 1.5; }
+  #guide details .msg .bubble p + p { margin-top: 16px; }
+  #guide details .msg { margin: 8px 0 24px; }
+
+  /* Setup steps */
+  .step .k { margin-bottom: 20px; }
+  .step .k b { color: var(--accent); font-weight: 600; }
+  .step .action { margin-top: 30px; font-size: 22px; }
+  .step .action b { font-weight: 700; }
+  .step .action p { margin: 0 0 14px; }
+  .see { margin-top: 30px; padding: 20px 24px; background: var(--tint); border-radius: 12px; font-size: 17px; }
+  .see .k { display: block; margin-bottom: 8px; color: var(--accent); }
+  .aside { margin-top: 18px; font-size: 16px; color: var(--soft); }
+  .aside b { color: var(--ink); font-weight: 700; }
+  pre { margin: 0; white-space: pre-wrap; font: 400 16px/1.55 var(--sans); background: var(--tint); border-radius: 12px; padding: 20px 24px; position: relative; padding-right: 96px; }
+  .copy { position: absolute; right: 14px; top: 14px; font: 600 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; background: var(--ink); color: var(--paper); border: 0; border-radius: 999px; padding: 9px 13px; cursor: pointer; }
+  .copy:hover { background: var(--accent); }
+  .dots { display: flex; gap: 8px; margin-top: 44px; }
+  .dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--rule); }
+  .dots i.on { background: var(--ink); }
+
+  /* Guide */
+  #guide { display: none; padding: 120px 40px 120px; }
+  #guide.on { display: block; }
+  #guide article { width: min(680px, 100%); margin: 0 auto; }
+  #guide .head { padding-bottom: 40px; border-bottom: 1px solid var(--rule); margin-bottom: 56px; }
+  #guide .head .k { margin-bottom: 22px; }
+  #guide .head h1 { font-size: 46px; }
+  #guide .q { font-family: var(--serif); font-style: italic; font-size: 24px; margin: 22px 0 0; color: var(--soft); }
+  #guide section { margin-bottom: 64px; }
+  #guide section .k { display: block; margin-bottom: 14px; color: var(--accent); }
+  #guide h2 { font-size: 34px; margin-bottom: 18px; }
+  #guide p { margin: 0 0 18px; }
+  #guide p.small { font-size: 17px; color: var(--soft); }
+  details { margin-top: 18px; border-top: 1px solid var(--rule); }
+  summary { cursor: pointer; list-style: none; padding: 16px 0; font-size: 17px; color: var(--soft); display: flex; justify-content: space-between; align-items: center; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font-family: var(--mono); font-size: 18px; }
+  details[open] summary::after { content: "–"; }
+  details[open] summary { color: var(--ink); }
+  details pre { margin-bottom: 18px; }
+  .lines { list-style: none; margin: 0; padding: 0; }
+  .lines li { display: grid; grid-template-columns: 140px 1fr; gap: 16px; padding: 14px 0; border-top: 1px solid var(--rule); font-size: 18px; }
+  .lines li:last-child { border-bottom: 1px solid var(--rule); }
+  .lines li b { font-weight: 700; }
+  .lines li span { color: var(--soft); }
+  .note { margin-top: 40px; padding: 26px 30px; background: var(--tint); border-radius: 14px; font-family: var(--serif); font-size: 21px; line-height: 1.5; }
+  .note .k { display: block; font-family: var(--mono); margin-bottom: 12px; }
+  .note p { margin: 0 0 14px; } .note p:last-child { margin: 0; }
+  .end { border-top: 1px solid var(--rule); padding-top: 40px; color: var(--soft); font-size: 17px; }
+
+  @media (max-width: 720px) {
+    .brand { padding: 18px 22px; } .brand span:nth-child(2) { display: none; }
+    .screen { padding: 88px 22px 48px; } #guide { padding: 96px 22px 80px; }
+    h1, #ceo h1 { font-size: 36px; } h2, #guide h2 { font-size: 28px; } #guide .head h1 { font-size: 34px; }
+    .lines li { grid-template-columns: 1fr; gap: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="brand"><span>Decision Makers Club · Session 01</span><span id="tablelabel"></span><a href="./" id="changelink" class="hidden">Change table</a></div>
+
+<!-- 0 · Welcome -->
+<section class="screen on" id="pick">
+  <div class="fade">
+    <div class="k">Welcome</div>
+    <h1 style="margin-top:20px">Good to have you here.<br>Which table are you at?</h1>
+    <form class="table" id="form">
+      <input type="number" id="table" min="1" max="99" inputmode="numeric" placeholder="12" aria-label="Table number" required autofocus>
+      <button class="btn" type="submit">Let's begin</button>
+    </form>
+    <p class="lede">The number is on a card on your table.</p>
+  </div>
+</section>
+
+<!-- 1 · CEO line -->
+<section class="screen" id="ceo">
+  <div class="fade">
+    <div class="msg">
+      <div class="from"><span class="av">NA</span><div><b>Naman Agarwal</b><span>CEO, Meridian · to Table <span class="tableno"></span> · 09:12</span></div></div>
+      <div class="bubble"><p id="ceoline"></p></div>
+    </div>
+    <div class="row"><button class="btn hidden" id="ceonext" data-go="s1">Continue</button></div>
+  </div>
+</section>
+
+<!-- Setup 1 -->
+<section class="screen step" id="s1">
+  <div class="fade">
+    <div class="k"><b>Setting up</b> · 1 of 4</div>
+    <h2>First, the company's data.</h2>
+    <div class="action">
+      <p>Everything about the company for the last twenty months is in one file. Download it and leave it where it lands.</p>
+    </div>
+    <div class="row"><a class="btn" href="./data/meridian_data.zip" download>Download the data</a></div>
+    <div class="see"><span class="k">You should see</span>A file called <b>meridian_data.zip</b> in your Downloads folder. Please don't open it; that's the analyst's job.</div>
+    <div class="dots"><i class="on"></i><i></i><i></i><i></i></div>
+    <div class="row"><button class="btn quiet" data-go="s2">Done, next</button><button class="back" data-go="ceo">Back</button></div>
+  </div>
+</section>
+
+<!-- Setup 2 -->
+<section class="screen step" id="s2">
+  <div class="fade">
+    <div class="k"><b>Setting up</b> · 2 of 4</div>
+    <h2>Now, your analyst.</h2>
+    <div class="action">
+      <p>Open <a href="https://chatgpt.com" target="_blank" rel="noopener">chatgpt.com</a> in a new tab and sign in. Start a fresh chat.</p>
+    </div>
+    <div class="see"><span class="k">You should see</span>An empty chat with a box at the bottom that says <b>"Ask anything"</b>.</div>
+    <p class="aside">It needs a paid account to read a file this size. <b>If nobody at the table has one, raise a hand</b> and we'll lend you a login.</p>
+    <div class="dots"><i></i><i class="on"></i><i></i><i></i></div>
+    <div class="row"><button class="btn quiet" data-go="s3">Done, next</button><button class="back" data-go="s1">Back</button></div>
+  </div>
+</section>
+
+<!-- Setup 3 -->
+<section class="screen step" id="s3">
+  <div class="fade">
+    <div class="k"><b>Setting up</b> · 3 of 4</div>
+    <h2>Hand it the file.</h2>
+    <div class="action">
+      <p>Click the <b>+</b> at the left of the chat box, choose <b>Upload from computer</b>, and pick <b>meridian_data.zip</b> from Downloads. Give it a moment.</p>
+    </div>
+    <div class="see"><span class="k">You should see</span>The file name sitting just above the chat box, with a small tick beside it.</div>
+    <p class="aside">If it complains the file is too large, try once more. <b>Still stuck? Raise a hand.</b></p>
+    <div class="dots"><i></i><i></i><i class="on"></i><i></i></div>
+    <div class="row"><button class="btn quiet" data-go="s4">Done, next</button><button class="back" data-go="s2">Back</button></div>
+  </div>
+</section>
+
+<!-- Setup 4 -->
+<section class="screen step" id="s4">
+  <div class="fade">
+    <div class="k"><b>Setting up</b> · 4 of 4</div>
+    <h2>Say hello.</h2>
+    <div class="action">
+      <p>Paste this in, press Enter. It tells the analyst how you'd like to work together.</p>
+    </div>
+    <pre id="starter">I've uploaded a zip of our company's data. Please open it, read the README first, then load all the tables. Tell me in plain English, one line each, what they contain. No calculations yet.
+From here on, whenever you give me a number, tell me exactly what you counted and what you left out.<button type="button" class="copy" data-copy="starter">Copy</button></pre>
+    <div class="see"><span class="k">You should see</span>A short, plain-English list: orders, customers, shipments, returns, payments, and so on.</div>
+    <p class="aside">If it says it can't open the file, reply <i>"Try again using Python"</i>. <b>Still nothing? Raise a hand.</b></p>
+    <div class="dots"><i></i><i></i><i></i><i class="on"></i></div>
+    <div class="row"><button class="btn" data-go="done">That worked</button><button class="back" data-go="s3">Back</button></div>
+  </div>
+</section>
+
+<!-- Setup done -->
+<section class="screen" id="done">
+  <div class="fade">
+    <div class="k">Setup done</div>
+    <h1 style="margin-top:20px">That's the hard part over.<br>Now the interesting part.</h1>
+    <p class="lede">You have an hour. Here's how we'd spend it.</p>
+    <div class="row"><button class="btn" data-go="guide">Show me</button></div>
+  </div>
+</section>
+
+<!-- Guide -->
+<main id="guide">
+  <article>
+    <div class="head fade">
+      <div class="k">The hour ahead</div>
+      <h1>Bring back one number<br>you'd stand behind.</h1>
+      <p class="q">"<span id="ceoline2"></span>"</p>
+      <p class="small" style="margin-top:22px"><button class="back" data-go="s1">Missed the setup? Go through it again →</button></p>
+    </div>
+
+    <section>
+      <span class="k">Before anything · 5 minutes</span>
+      <h2>Ask what the number is for.</h2>
+      <p>Your CEO isn't collecting statistics. He's about to decide something, and this number will tip it one way or the other. Read his note again and find the decision hiding in it.</p>
+      <p>Then agree, out loud, on one sentence: <i>"He will use this to decide whether to…"</i>. Everything else follows from that sentence. If the table can't agree, the facilitator is playing the CEO today. Go and ask him.</p>
+      <details><summary>His full note</summary>
+        <div class="msg">
+          <div class="from"><span class="av">NA</span><div><b>Naman Agarwal</b><span>CEO, Meridian · to Table <span class="tableno"></span> · 09:12</span></div></div>
+          <div class="bubble" id="fullnote"></div>
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <span class="k">Then · 10 minutes</span>
+      <h2>Follow one story from start to finish.</h2>
+      <p>Every number is made of thousands of small stories: an order placed, shipped, delivered, sometimes sent back. Before you count them, understand one of them completely.</p>
+      <p>Ask your analyst to walk you through a single real case, with every date, and then to list all the different ways such a case can end. Sketch it on paper: the start on the left, the endings on the right. Ask yourselves which endings belong in the CEO's number, which don't, and which aren't finished yet.</p>
+      <details><summary>If you'd like a starting point, say something like this</summary>
+        <pre id="p1">Take the question "<span class="q1"></span>". Pick one real case from the data that this is about and walk me through it from beginning to end, with every date and every change of status, in plain English. Then list every way such a case can end, and how many August cases ended each way.<button type="button" class="copy" data-copy="p1">Copy</button></pre>
+      </details>
+    </section>
+
+    <section>
+      <span class="k">Then · 10 minutes</span>
+      <h2>Find the forks.</h2>
+      <p>A fork is anywhere two sensible people would count differently. Does a cancelled order count? Is a customer "new" if we've seen their phone number before? Does August mean when it was ordered, or when it arrived?</p>
+      <p>There are usually five to eight forks in a question like yours, and each one moves the number. Ask the analyst to list them without choosing, and to point out anything odd in the data while it's there. Then choose at every fork yourselves, using the sentence from the first step. Write the choices down.</p>
+      <details><summary>If you'd like a starting point, say something like this</summary>
+        <pre id="p2">Before calculating anything for "<span class="q1"></span>": list every choice I'd have to make to turn this into one number, with the options for each, and roughly how much the number would move. Also tell me anything odd you notice in the data: duplicates, test records, missing dates, things still in progress. Don't pick, and don't give me the answer yet.<button type="button" class="copy" data-copy="p2">Copy</button></pre>
+      </details>
+    </section>
+
+    <section>
+      <span class="k">Then · 10 minutes</span>
+      <h2>Write the definition in seven lines.</h2>
+      <p>This is the most valuable thing you'll make today. It's what makes your number yours, rather than the analyst's. Plain words, one line each.</p>
+      <ul class="lines">
+        <li><b>Why</b><span>the decision it serves</span></li>
+        <li><b>Who or what</b><span>which customers, orders or products count</span></li>
+        <li><b>What happened</b><span>the event that counts: placed, delivered, paid, returned…</span></li>
+        <li><b>When</b><span>which date puts it in August</span></li>
+        <li><b>Rules</b><span>what's in, what's out, how the odd cases are treated</span></li>
+        <li><b>Check</b><span>what you'll compare it against</span></li>
+        <li><b>Claim</b><span>what the number proves, and what it doesn't</span></li>
+      </ul>
+    </section>
+
+    <section>
+      <span class="k">Then · 10 minutes</span>
+      <h2>Now ask for the number.</h2>
+      <p>Give the analyst your seven lines and ask it to calculate exactly that, nothing else, and to show what it included and excluded with counts. Read that list slowly. If it quietly left something out that you wanted in, say so. Don't accept the first number.</p>
+      <details><summary>If you'd like a starting point, say something like this</summary>
+        <pre id="p3">Calculate "<span class="q1"></span>" using exactly this definition and no other:
+[paste your seven lines]
+Give me one number. Under it, a short table of what you included and what you excluded, with a count for each. If my definition is unclear anywhere, ask me before choosing.<button type="button" class="copy" data-copy="p3">Copy</button></pre>
+      </details>
+    </section>
+
+    <section>
+      <span class="k">Then · 10 minutes</span>
+      <h2>Check it a second way.</h2>
+      <p>A number you've reached once is a guess. Ask the analyst to get to it again by a different route, through a different part of the data, and to explain every bit of the gap. Then ask what could make your number wrong, and how much each thing could move it.</p>
+      <p>If the gap is big and nobody can explain it, you've missed a fork. Go back for that one fork. Don't start over.</p>
+      <details><summary>If you'd like a starting point, say something like this</summary>
+        <pre id="p4">Check that two ways. First, calculate the same thing again by a different route through the data; show both numbers and explain every bit of the difference. Second, tell me what in the data could make my number wrong, and how much each thing could move it. Finish with the number you'd stand behind and one sentence on what it doesn't prove.<button type="button" class="copy" data-copy="p4">Copy</button></pre>
+      </details>
+    </section>
+
+    <section>
+      <span class="k">Last · 5 minutes</span>
+      <h2>Decide what you'll say.</h2>
+      <p>You'll have three minutes in front of the room. Say these, in this order. The last one is the one everybody forgets.</p>
+      <ul class="lines">
+        <li><b>The question</b><span>as the CEO asked it</span></li>
+        <li><b>The decision</b><span>it serves</span></li>
+        <li><b>The forks</b><span>the two or three that mattered most</span></li>
+        <li><b>The definition</b><span>you chose, and why</span></li>
+        <li><b>The number</b><span>and what was counted</span></li>
+        <li><b>The check</b><span>and how big the gap was</span></li>
+        <li><b>The conclusion</b><span>one sentence he can act on</span></li>
+        <li><b>The limits</b><span>what the number does not prove</span></li>
+      </ul>
+      <div class="note">
+        <span class="k">One last thing</span>
+        <p>Defend the number, not the tool. "The AI said so" isn't an answer. Say what it counts, what it leaves out, and why you chose that.</p>
+        <p>One number with its limits beats three without.</p>
+      </div>
+    </section>
+
+    <p class="end">Good luck. Raise a hand whenever you'd like a second opinion.<br><span style="font-size:14px">Decision Makers Club, Session 01 · exercise designed by Naman Agarwal, Sancalana</span></p>
+  </article>
+</main>
+
+<script>
+  const PACKS = [
+    { line: "What did it cost us to get a new customer in August?",
+      note: ["I sign off next quarter's marketing budget on Monday. Growth tells me we acquire customers cheaply and should spend more. Finance tells me the payback doesn't add up and we should spend less. Both are looking at the same August.",
+             "Before I approve anything: what did it cost us to acquire one new customer in August? One rupee figure. Tell me what you counted as spend, who you counted as new, and why the other two would get a different number."] },
+    { line: "Did our website convert better or worse in August than in July?",
+      note: ["Product wants budget for a checkout redesign, on the grounds that the site converted worse in August than in July and the checkout is to blame. Marketing says the site is fine and it's the traffic that changed.",
+             "Settle it with the data. One rate for each month and the change between them. Tell me what you counted as a visit, what as a conversion, and whether the two months are truly comparable. If they aren't, say so."] },
+    { line: "What share of our August orders were delivered on time?",
+      note: ["We renew our courier contracts this month. Operations tells me delivery is \"fine, about nine in ten on time\". Customer service tells me the inbox says otherwise. I don't want to renegotiate on either side's feeling.",
+             "One percentage. Tell me exactly what \"on time\" means in your number, which orders you counted and which you didn't, and whether it changes by courier or region. I'll use it at the table with the couriers."] },
+    { line: "What did returns cost us in August?",
+      note: ["Finance wants to tighten the return policy: shorter window, no free pick-up. The brand team says returns are the cost of doing business online and a tighter policy will cost us more in lost customers than it saves.",
+             "I can't judge that without the first number. One rupee figure for August. Tell me what you counted as a return, what as a cost, and what you left out. If there are things that look like returns but aren't, tell me how you treated them."] },
+    { line: "What share of our August sales came from repeat customers?",
+      note: ["Our investor deck calls us a \"repeat-led brand\". I've said it in three meetings. Before I say it a fourth time, I want to know whether it's true.",
+             "Give me the share, and tell me what it's a share of. Tell me how you decided who is repeat and who is new, and how sure you are that you can tell one customer from another in our data. If the honest answer is a range, give me the range."] },
+    { line: "Did customer complaints go up in August compared to July?",
+      note: ["I keep hearing from the floor that complaints have gone up since we changed the helpdesk over the summer. The head of customer service says the numbers look fine. I haven't seen the numbers.",
+             "One figure for each month that I can fairly compare. Tell me what you counted as a complaint, how you made the two months comparable given the system change, and whether the change is real or just growth. If it's real, tell me what kind of complaints are driving it."] },
+    { line: "What was our gross margin in August?",
+      note: ["The board pack goes out on Wednesday and the first question will be margin. The August sale moved a lot of volume; I want to know what it did to what we actually keep on each sale.",
+             "A percentage and the rupee figure behind it. Tell me what's in \"sold\" and what's in \"cost\", and what you left out of each. Be clear about discounts, taxes, shipping and the goods that came back."] },
+    { line: "How much did the August stock-out of our hero products cost us?",
+      note: ["Supply chain wants a much bigger safety stock on our hero products after the August stock-out. That's a lot of cash tied up in inventory. Before I fund it, I want to know what the stock-out actually cost us.",
+             "One rupee figure for lost sales. Tell me how you worked out what we'd have sold had the products been in stock, how you separated that from what we'd never have sold anyway, and how much of it is estimate rather than fact."] },
+  ];
+
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+  let table = 0, pack = null, timer = null;
+
+  function go(id) {
+    $$('.screen, #guide').forEach(s => s.classList.remove('on'));
+    $('#' + id).classList.add('on');
+    if (id === 'ceo') {
+      $('#ceonext').classList.add('hidden'); clearTimeout(timer);
+      timer = setTimeout(() => $('#ceonext').classList.remove('hidden'), 5000);
+    }
+    try { localStorage.setItem('dmc', JSON.stringify({ table, at: id })); } catch (e) {}
+    try { history.replaceState(null, '', `?table=${table}&at=${id}`); } catch (e) {}
+    window.scrollTo({ top: 0 });
+  }
+  function reset() {
+    try { localStorage.removeItem('dmc'); } catch (e) {}
+    try { history.replaceState(null, '', location.pathname); } catch (e) {}
+    $$('.screen, #guide').forEach(s => s.classList.remove('on'));
+    $('#pick').classList.add('on'); $('#changelink').classList.add('hidden'); $('#tablelabel').textContent = '';
+    $('#table').value = ''; $('#table').focus(); window.scrollTo({ top: 0 });
+  }
+  function start(t, at) {
+    table = Math.max(1, parseInt(t, 10) || 1); pack = PACKS[(table - 1) % 8];
+    $('#tablelabel').textContent = 'Table ' + table; $('#changelink').classList.remove('hidden');
+    $$('.tableno').forEach(e => e.textContent = table);
+    $('#ceoline').textContent = pack.line; $('#ceoline2').textContent = pack.line;
+    $$('.q1').forEach(e => e.textContent = pack.line);
+    $('#fullnote').innerHTML = pack.note.map(p => `<p>${p}</p>`).join('') + `<p>You have an hour with the data. Bring me one number you can defend.<br>— Naman</p>`;
+    go(at && $('#' + at) ? at : 'ceo');
+  }
+  $('#form').addEventListener('submit', e => { e.preventDefault(); start($('#table').value, 'ceo'); });
+  $$('[data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go)));
+  $$('[data-copy]').forEach(b => b.addEventListener('click', () => {
+    const pre = document.getElementById(b.dataset.copy);
+    const text = [...pre.childNodes].filter(n => n.nodeType === 3 || n.tagName === 'SPAN').map(n => n.textContent).join('');
+    navigator.clipboard.writeText(text).then(() => { b.textContent = 'Copied'; setTimeout(() => b.textContent = 'Copy', 1500); });
+  }));
+  $('#changelink').addEventListener('click', e => { e.preventDefault(); reset(); });
+  const q = new URLSearchParams(location.search);
+  let remembered = null; try { remembered = JSON.parse(localStorage.getItem('dmc') || 'null'); } catch (e) {}
+  if (q.get('table')) start(q.get('table'), q.get('at'));
+  else if (remembered && remembered.table) start(remembered.table, remembered.at);
+</script>
+</body>
+</html>

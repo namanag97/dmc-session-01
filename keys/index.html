@@ -1,0 +1,1083 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Answer keys. Eight questions, eight defensible numbers.</title>
+<style>
+  @font-face { font-family: Geist; src: url("./right-data-assets/Geist-Regular.woff2") format("woff2"); font-weight: 400; }
+  @font-face { font-family: Geist; src: url("./right-data-assets/Geist-Bold.woff2") format("woff2"); font-weight: 700; }
+  @font-face { font-family: "Geist Mono"; src: url("./right-data-assets/GeistMono-Regular.woff2") format("woff2"); font-weight: 400; }
+  @font-face { font-family: "Geist Mono"; src: url("./right-data-assets/GeistMono-SemiBold.woff2") format("woff2"); font-weight: 600; }
+
+  :root {
+    --paper: #ffffff; --tint: #f3f4f6; --ink: #111318; --muted: #6b7280;
+    --rule: #d6d9df; --soft: #e7e9ee; --accent: #1d4ed8;
+    --sans: Geist, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --mono: "Geist Mono", "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 100%; height: 100%; background: #e5e7eb; overflow: hidden; }
+  body { font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: antialiased; }
+  h1, h2, h3, p { margin: 0; }
+  button { font: inherit; }
+
+  .stage { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform: translate(-50%, -50%) scale(var(--s, 1)); transform-origin: center; background: var(--paper); box-shadow: 0 30px 80px rgba(0,0,0,.18); }
+  .slide { position: absolute; inset: 0; display: none; padding: 110px 112px 96px; grid-template-rows: auto 1fr; row-gap: 56px; background: var(--paper); }
+  .slide.active { display: grid; }
+  .slide.center { grid-template-rows: 1fr; align-items: center; }
+  .pg { position: absolute; right: 112px; bottom: 44px; font: 600 15px/1 var(--mono); color: var(--muted); letter-spacing: .06em; }
+  .stepmark { position: absolute; left: 112px; bottom: 44px; font: 600 15px/1 var(--mono); color: var(--accent); letter-spacing: .08em; text-transform: uppercase; }
+  .packmark { position: absolute; left: 112px; top: 48px; font: 600 15px/1 var(--mono); color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+
+  h1 { font-size: 128px; line-height: .94; letter-spacing: -.05em; font-weight: 700; max-width: 13ch; }
+  h2 { font-size: 62px; line-height: 1; letter-spacing: -.04em; font-weight: 700; max-width: 28ch; }
+  h2 .accent { color: var(--accent); }
+  h2 small { display: block; margin-top: 20px; font-size: 28px; line-height: 1.3; font-weight: 400; letter-spacing: -.01em; color: var(--muted); max-width: 52ch; }
+  .body { min-height: 0; display: grid; align-content: center; }
+  .accent { color: var(--accent); }
+  .mono { font-family: var(--mono); }
+
+  .cover { display: grid; grid-template-columns: 1fr 340px; column-gap: 72px; align-items: end; }
+  .cover .block { background: var(--accent); height: 440px; }
+  .cover-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--ink); font-size: 24px; }
+  .cover-meta span:last-child { color: var(--muted); }
+
+  .q h2 { font-size: 112px; letter-spacing: -.05em; max-width: 14ch; }
+  .q .from { margin-top: 40px; font: 600 18px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .q .decision { margin-top: 56px; padding-top: 28px; border-top: 3px solid var(--accent); max-width: 60ch; font-size: 34px; line-height: 1.25; letter-spacing: -.015em; }
+  .q .decision b { color: var(--accent); font-weight: 700; }
+
+  .flow { display: grid; gap: 14px; }
+  .flow .node { border-top: 3px solid var(--ink); padding-top: 18px; position: relative; }
+  .flow .node::after { content: "→"; position: absolute; right: -14px; top: -22px; font-size: 22px; color: var(--muted); }
+  .flow .node:last-child::after { content: ""; }
+  .flow .node.back { border-top-color: var(--accent); }
+  .flow .node time { display: block; font: 600 14px/1 var(--mono); color: var(--muted); }
+  .flow .node b { display: block; margin-top: 12px; font-size: 26px; letter-spacing: -.02em; line-height: 1.05; }
+  .flow .node.back b { color: var(--accent); }
+  .states { margin-top: 56px; display: grid; gap: 24px; }
+  .state { background: var(--tint); padding: 24px 26px; }
+  .state .k { font: 600 14px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .state .v { display: block; margin-top: 14px; font: 600 40px/1 var(--mono); letter-spacing: -.03em; }
+  .state .d { display: block; margin-top: 10px; font-size: 19px; color: var(--muted); line-height: 1.3; }
+  .state.acc { background: var(--ink); color: #fff; }
+  .state.acc .k, .state.acc .d { color: #c7cbd3; }
+
+  .forks { border-top: 3px solid var(--ink); }
+  .fork { display: grid; grid-template-columns: 60px 400px 1fr; align-items: center; gap: 32px; min-height: 92px; border-bottom: 1px solid var(--rule); }
+  .fork .n { font: 600 15px/1 var(--mono); color: var(--accent); }
+  .fork .k { font-size: 29px; font-weight: 700; letter-spacing: -.02em; line-height: 1.05; }
+  .fork .opts { display: flex; flex-wrap: wrap; gap: 12px; }
+  .fork .opt { padding: 10px 16px; border: 1px solid var(--rule); font-size: 22px; line-height: 1; color: var(--muted); }
+  .fork .opt.on { border-color: var(--ink); color: var(--ink); font-weight: 700; }
+
+  .bars { display: grid; grid-template-columns: 520px 1fr 300px; row-gap: 22px; column-gap: 48px; align-items: center; }
+  .bars .lbl { font-size: 30px; font-weight: 700; letter-spacing: -.02em; line-height: 1.05; }
+  .bars .lbl small { display: block; font-size: 19px; font-weight: 400; color: var(--muted); margin-top: 6px; line-height: 1.25; }
+  .bars .lbl .team { display: block; font: 600 13px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .bars .bar { height: 60px; background: var(--soft); }
+  .bars .bar.hi { background: var(--accent); }
+  .bars .val { font: 600 40px/1 var(--mono); text-align: right; letter-spacing: -.02em; }
+  .bars .val.hi { color: var(--accent); }
+
+  .defs { border-top: 3px solid var(--ink); }
+  .def { display: grid; grid-template-columns: 60px 260px 1fr; align-items: center; gap: 32px; min-height: 96px; border-bottom: 1px solid var(--rule); }
+  .def .n { font: 600 15px/1 var(--mono); color: var(--accent); }
+  .def .k { font: 600 20px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+  .def .v { font-size: 31px; font-weight: 700; letter-spacing: -.02em; line-height: 1.08; }
+  .def .v small { display: block; margin-top: 8px; font-size: 21px; font-weight: 400; color: var(--muted); }
+
+  .concl { display: grid; grid-template-columns: 1.05fr 1fr; gap: 72px; align-items: start; }
+  .bignum { border-top: 3px solid var(--accent); padding-top: 26px; }
+  .bignum .k { font: 600 15px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .bignum .v { display: block; margin-top: 22px; font: 600 104px/1 var(--mono); letter-spacing: -.05em; }
+  .bignum .d { display: block; margin-top: 22px; font-size: 27px; line-height: 1.3; color: var(--muted); }
+  .checklist { margin-top: 40px; border-top: 3px solid var(--ink); }
+  .checklist .hd { font: 600 15px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--ink); padding: 18px 0 16px; display: block; }
+  .checklist div { display: grid; grid-template-columns: 1fr 300px; align-items: baseline; gap: 24px; padding: 18px 0; border-bottom: 1px solid var(--rule); font-size: 25px; line-height: 1.15; }
+  .checklist div span:last-child { font: 600 23px/1 var(--mono); text-align: right; color: var(--accent); }
+  .limits { border-top: 3px solid var(--ink); padding-top: 26px; }
+  .limits .k { font: 600 15px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .limits p { margin-top: 18px; padding-bottom: 16px; border-bottom: 1px solid var(--rule); font-size: 25px; line-height: 1.25; }
+  .limits p b { color: var(--accent); }
+
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
+  .tile { background: var(--tint); padding: 32px; min-height: 280px; display: grid; align-content: space-between; }
+  .tile .n { font: 600 15px/1 var(--mono); color: var(--muted); }
+  .tile b { font-size: 36px; letter-spacing: -.03em; line-height: 1.05; }
+  .tile b small { display: block; margin-top: 14px; font-size: 21px; font-weight: 400; color: var(--muted); line-height: 1.3; }
+  .tile .val { font: 600 44px/1 var(--mono); letter-spacing: -.03em; color: var(--accent); margin-top: 14px; display: block; }
+
+  .index { border-top: 3px solid var(--ink); }
+  .index div { display: grid; grid-template-columns: 70px 1fr 360px; align-items: baseline; gap: 32px; padding: 22px 0; border-bottom: 1px solid var(--rule); }
+  .index .n { font: 600 16px/1 var(--mono); color: var(--accent); }
+  .index b { font-size: 33px; letter-spacing: -.025em; line-height: 1.05; }
+  .index span:last-child { font: 600 30px/1 var(--mono); text-align: right; letter-spacing: -.02em; }
+
+  .nav { position: fixed; right: 24px; bottom: 16px; z-index: 5; display: flex; gap: 16px; }
+  .nav button { border: 0; background: transparent; color: #374151; font: 600 14px/1 var(--mono); cursor: pointer; padding: 6px 0; border-bottom: 1px solid transparent; }
+  .nav button:hover { border-bottom-color: #374151; }
+
+  @media print {
+    @page { size: 1920px 1080px; margin: 0; }
+    html, body { overflow: visible; background: #fff; }
+    .stage { position: static; transform: none; box-shadow: none; width: 1920px; height: auto; }
+    .slide { position: relative; display: grid !important; width: 1920px; height: 1080px; break-after: page; }
+    .nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Numbers. Regenerated from data/workshop/generated_d2c/keys_d2c.json by output/sync_keys.py; never edit by hand. -->
+<script type="application/json" id="keys">
+{
+  "p1_shopify_order_entry": 32727647,
+  "p1_webstore_order_entry": 19184053,
+  "p1_order_entry_all": 32727647,
+  "p1_placed_n": 15110,
+  "p1_test_orders_value": 30820,
+  "p1_cancelled_value": 1192997,
+  "p1_cancelled_n": 558,
+  "p1_gst_on_placed": 3340413,
+  "p1_net_sales_placed": 28163417,
+  "p1_rto_value": 4293541,
+  "p1_rto_n": 2225,
+  "p1_delivered_sep_value": 4060140,
+  "p1_delivered_sep_n": 2087,
+  "p1_in_transit_value": 465763,
+  "p1_in_transit_n": 240,
+  "p1_july_delivered_aug_value": 3425448,
+  "p1_july_delivered_aug_n": 1734,
+  "p1_delivered_aug": 22769421,
+  "p1_delivered_aug_n": 11713,
+  "p1_returns_received_value": 1319238,
+  "p1_returns_received_n": 902,
+  "p1_exchanges_value": 343132,
+  "p1_exchanges_n": 254,
+  "p1_net_revenue": 21450183,
+  "p1_net_board": 21450183,
+  "p1_cod_unremitted_value": 2581231,
+  "p1_cod_unremitted_n": 1426,
+  "p1_cod_prior_remitted_value": 2101303,
+  "p1_returns_requested_not_received": 0,
+  "p1_delivered_n_placed": 12085,
+  "p1_cancelled_n_placed": 560,
+  "p1_rto_n_placed": 2225,
+  "p1_in_transit_n_placed": 240,
+  "p1_dup_order_ids": 0,
+  "p1_example_order": "O0193136",
+  "p1_example_dates": "2026-07-29 | 2026-07-31 | 2026-07-31 | 2026-08-05 | 952 | Jaipur | 2026-08-17 | 2026-08-22 | 2026-09-01 | MRD-W-TEE-004",
+  "p1_books_revenue": 20995506,
+  "p1_meta_claimed_value": 14448186,
+  "p1_mkt_gmv": 13543594,
+  "p1_mkt_net_settled": 7163051,
+  "p1_gst_igst": 1139252,
+  "p1_gst_cgst_sgst": 472608,
+  "p1_test_orders": 21,
+  "p1_cod_remitted": 5736535,
+  "j1_paid_spend_naive": 1758308,
+  "j1_restated_rows": 5,
+  "j1_new_ids_raw": 8333,
+  "j1_new_ids_raw_paid": 2498,
+  "j1_new_people_marketplace": 2900,
+  "j1_new_paid_delivered": 1737,
+  "j1_new_paid_rto": 439,
+  "j1_paid_spend": 1626218,
+  "j1_new_paid_customers": 2199,
+  "j1_new_all_customers": 7284,
+  "j1_paid_cac": 739.53,
+  "j1_blended_cac": 223.26,
+  "j1_meta_roas_claimed": 14.14,
+  "j1_mer": 11.8,
+  "j1_meta_cpc": 18.48,
+  "j1_meta_cpm": 758.69,
+  "j1_new_order_pct": 60.68,
+  "j1_cod_share_new_t2t3": 66.41,
+  "j1_identity_dup_people": 11170,
+  "j1_jul_paid_cac": 553.92,
+  "j1_jul_paid_spend": 1038609,
+  "j1_jul_new_paid_customers": 1875,
+  "j1_paid_cac_delivered": 936.22,
+  "j1_paid_cac_naive": 703.89,
+  "j2_cvr_all": 2.18,
+  "j2_cvr_eligible": 2.42,
+  "j2_atc_rate": 22.98,
+  "j2_checkout_completion": 8.12,
+  "j2_bot_pct": 9.53,
+  "j2_cvr_mobile": 2.41,
+  "j2_cvr_desktop": 2.42,
+  "j2_aov_web": 2141.56,
+  "j2_late_purchase_events": 5285,
+  "j2_cvr_paid": 2.41,
+  "j2_jul_cvr_all": 2.57,
+  "j2_jul_cvr_eligible": 2.78,
+  "j2_jul_bot_pct": 7.01,
+  "j2_jul_checkout_completion": 9.28,
+  "j2_sessions_eligible": 332206,
+  "j2_jul_sessions_eligible": 265950,
+  "j2_cvr_paid_jul": 2.79,
+  "j2_paid_session_share": 77.89,
+  "j2_paid_session_share_jul": 72.03,
+  "j3_ontime_dashboard": 92.13,
+  "j3_ontime_true": 90.08,
+  "j3_edd_hit_pct": 86.55,
+  "j3_median_tat": 5,
+  "j3_ndr_rate": 25.24,
+  "j3_ndr_recovery_pct": 36.7,
+  "j3_avg_attempts": 1.09,
+  "j3_wismo_per_100": 1.74,
+  "j3_orphan_awbs": 40,
+  "j3_east_median_tat": 6,
+  "j3_jul_ontime_dashboard": 96.51,
+  "j3_placed_aug": 15089,
+  "j3_placed_delivered": 12066,
+  "j3_placed_rto": 2225,
+  "j3_placed_cancelled": 558,
+  "j3_placed_in_transit": 240,
+  "j3_placed_delivered_by_promise": 10280,
+  "j3_edd_hit_placed": 85.21,
+  "j3_edd_hit_placed_jul": 88.72,
+  "j3_edd_hit_all_placed": 70.75,
+  "j3_edd_plus2_placed": 97.98,
+  "j3_edd_hit_east": 69.37,
+  "j3_edd_hit_west": 87.19,
+  "j3_edd_hit_north": 90.35,
+  "j3_edd_hit_south": 88.83,
+  "j3_edd_hit_tier1": 78.81,
+  "j3_edd_hit_tier3": 93.35,
+  "j3_edd_hit_sfx": 71.81,
+  "j3_edd_hit_dlv": 89.64,
+  "j3_edd_hit_xbe": 89.48,
+  "j3_edd_hit_ecm": 90.32,
+  "j3_edd_hit_bdt": 86.17,
+  "j3_first_attempt_by_promise": 88.9,
+  "j3_backdated_shipped": 1015,
+  "j4_rto_blended": 15.29,
+  "j4_rto_cod": 24.28,
+  "j4_rto_prepaid": 3.29,
+  "j4_rto_t3": 20.08,
+  "j4_return_rate": 9.81,
+  "j4_cancel_rate": 3.71,
+  "j4_refund_tat_median": 5,
+  "j4_reverse_fees": 220946,
+  "j4_true_reverse_cost": 1295068,
+  "j4_n_customer_return": 531,
+  "j4_refund_customer_return": 791285,
+  "j4_revfee_customer_return": 52569,
+  "j4_n_marketplace_return": 373,
+  "j4_refund_marketplace_return": 606827,
+  "j4_revfee_marketplace_return": 44760,
+  "j4_n_exchange": 247,
+  "j4_refund_exchange": 0,
+  "j4_revfee_exchange": 26490,
+  "j4_n_rto": 2198,
+  "j4_refund_rto": 0,
+  "j4_revfee_rto": 98720,
+  "j4_refunds_total_req": 1398112,
+  "j4_revfee_total_req": 222539,
+  "j4_rto_fwd_cost": 173796,
+  "j4_rto_cod_fee": 0,
+  "j4_mkt_rto_fee": 47470,
+  "j4_pg_fee_refunded": 15747,
+  "j4_damaged_units_cost": 47852,
+  "j4_out_of_pocket": 507404,
+  "j4_delivered_value_aug": 22769421,
+  "j4_returns_requested_not_closed": 47,
+  "j4_size_fit_share": 42.0,
+  "j4_mkt_returns_pending": 5187,
+  "j4_exchange_share": 21.46,
+  "j5_repeat_rev_share": 50.5,
+  "j5_repeat_rev_share_naive": 45.61,
+  "j5_90d_repeat_rate": 61.36,
+  "j5_festive_one_and_done": 76.68,
+  "j5_guest_order_pct": 12.09,
+  "j5_identity_dup_people": 11170,
+  "j5_apparel_asp_may": 1635.33,
+  "j5_apparel_asp_jun": 1736.39,
+  "j5_orders_from_repeaters_pct": 50.12,
+  "j5_jul_repeat_rev_share": 54.24,
+  "j5_delivered_ex_gst": 22769421,
+  "j5_repeat_rev_naive": 10372128,
+  "j5_repeat_rev_dedup": 11486838,
+  "j5_hidden_repeat_rev": 1114710,
+  "j5_hidden_repeat_orders": 561,
+  "j5_repeat_share_placed_all": 39.32,
+  "j5_repeat_share_orders": 50.12,
+  "j5_repeat_share_within_month": 27.67,
+  "j5_repeat_people_aug": 4981,
+  "j5_new_people_aug": 5019,
+  "j6_tickets_naive": 771,
+  "j6_tickets_dedup": 596,
+  "j6_contacts_per_100": 6.57,
+  "j6_wismo_per_100": 1.74,
+  "j6_frt_median": 18,
+  "j6_csat_mean": 3.42,
+  "j6_csat_response_pct": 11.15,
+  "j6_reopen_pct": 7.78,
+  "j6_migration_dupes": 47,
+  "j6_jul_tickets_naive": 696,
+  "j6_jul_tickets_dedup": 602,
+  "j6_tickets_dedup_aug": 711,
+  "j6_jul_contacts_per_100": 6.41,
+  "j6_delivered_aug": 11733,
+  "j6_delivered_jul": 10850,
+  "j6_contacts_per_100_dedup": 6.06,
+  "j6_jul_contacts_per_100_dedup": 5.55,
+  "j6_reopens_aug": 60,
+  "j6_reopens_jul": 47,
+  "j6_aug_delivery_delay": 221,
+  "j6_jul_delivery_delay": 190,
+  "j6_aug_return_refund": 130,
+  "j6_jul_return_refund": 112,
+  "j6_aug_quality": 58,
+  "j6_jul_quality": 47,
+  "j6_aug_wrong_item": 67,
+  "j6_jul_wrong_item": 49,
+  "j6_aug_general": 151,
+  "j6_jul_general": 140,
+  "j6_aug_other": 84,
+  "j6_jul_other": 64,
+  "j6_complaint_tags_aug": 476,
+  "j6_complaint_tags_jul": 398,
+  "j6_complaints_per_100_aug": 4.06,
+  "j6_complaints_per_100_jul": 3.67,
+  "j6_wismo_east_share": 19.05,
+  "j6_east_order_share": 18.51,
+  "j6_general_tag_pct": 20.62,
+  "j7_asp": 1195.38,
+  "j7_discount_depth": 18.86,
+  "j7_coupon_attach_pct": 40.76,
+  "j7_cm1_v1": 58.62,
+  "j7_cm1_v2": 54.21,
+  "j7_delivered_incl_gst": 25467654,
+  "j7_delivered_ex_gst": 22769421,
+  "j7_mrp_value": 34215452,
+  "j7_gst_delivered": 2698233,
+  "j7_units_delivered": 19048,
+  "j7_cogs_v1": 9421652,
+  "j7_cogs_v2": 10425977,
+  "j7_gm_v1": 13347769,
+  "j7_gm_v2": 12343444,
+  "j7_gm_pct_incl_gst_v2": 59.06,
+  "j7_gm_pct_mrp_v2": 69.53,
+  "j7_refunds_received_aug": 1464972,
+  "j7_returned_cogs_aug": 536503,
+  "j7_fulfilment_delivered": 907906,
+  "j7_shipping_charged_delivered": 57134,
+  "j7_mkt_commission_delivered": 2814584,
+  "j7_pg_cod_fees_delivered": 354292,
+  "j7_gm_after_returns_v2": 11414975,
+  "j7_gm_after_returns_pct": 53.58,
+  "j7_contribution_v2": 7395327,
+  "j7_contribution_pct": 34.71,
+  "j7_cost_v2_uplift_pct": 10.66,
+  "j7_cm2_v2": 46.21,
+  "j7_apparel_mix_pct": 85.47,
+  "j7_return_value_rate": 6.45,
+  "j7_jul_cm1_v1": 60.15,
+  "j7_jul_cm1_v2": 55.91,
+  "j8_hero_oos_days": 192,
+  "j8_hero_oos_rate": 7.61,
+  "j8_phantom_oos_rows": 51,
+  "j8_stock_missing_dates": 5,
+  "j8_hero_units_pre": 698,
+  "j8_hero_lost_units_naive": 280,
+  "j8_hero_units_pre_ew": 319,
+  "j8_hero_units_oos_ew": 0,
+  "j8_sale_uplift_ns": 2.04,
+  "j8_hero_lost_units_est": 260,
+  "j8_hero_asp_ex": 1278.35,
+  "j8_hero_lost_revenue_est": 332371,
+  "j8_hero_lost_revenue_naive": 357938,
+  "j8_hero_views_oos": 15789,
+  "j8_hero_views_pre": 17148,
+  "j8_phantom_hero_rows_aug": 20,
+  "j8_hero_oos_rows_ew": 192,
+  "j8_hero_units_oos": 309,
+  "j8_reserved_trap_rows": 6,
+  "j8_blocked_rate": 0.09,
+  "j8_hero_fill_wh_east": 0
+}
+</script>
+
+<main class="stage" id="stage"></main>
+
+<nav class="nav" aria-label="Navigation">
+  <button type="button" data-prev>← PREV</button>
+  <button type="button" data-next>NEXT →</button>
+</nav>
+
+<script>
+  const K = JSON.parse(document.getElementById('keys').textContent);
+
+  // Formatting. Whole rupees; lakh/crore with at most one decimal; percentages with one decimal.
+  const num = n => Math.round(n).toLocaleString('en-IN');
+  const inr = n => '₹' + num(Math.abs(n));
+  const L = n => Math.abs(n) >= 1e7 ? '₹' + (n / 1e7).toFixed(2) + ' Cr' : '₹' + (n / 1e5).toFixed(1) + ' L';
+  const pct = (n, d = 1) => n.toFixed(d) + '%';
+  const delta = (a, b) => { const d = 100 * (a - b) / b; return (d >= 0 ? '+' : '−') + Math.abs(d).toFixed(0) + '%'; };
+  const pp = (a, b) => { const d = a - b; return (d >= 0 ? '+' : '−') + Math.abs(d).toFixed(1) + ' pt'; };
+  const esc = s => String(s);
+
+  // ── Derived figures used only for presentation
+  const j4_customer_side = K.j4_revfee_customer_return + K.j4_revfee_marketplace_return + K.j4_revfee_exchange + K.j4_pg_fee_refunded + K.j4_damaged_units_cost;
+  const j4_rto_side = K.j4_revfee_rto + K.j4_rto_fwd_cost + K.j4_rto_cod_fee + K.j4_mkt_rto_fee;
+  const j4_reverse_total_n = K.j4_n_customer_return + K.j4_n_marketplace_return + K.j4_n_exchange + K.j4_n_rto;
+  const j7_net_rev = K.j7_delivered_ex_gst - K.j7_refunds_received_aug;
+
+  const PACKS = [
+    // ───────────────────────────── 1. Acquisition cost
+    {
+      id: 1, name: 'Acquisition', q: 'What did it cost us to get a new customer in August?',
+      decision: 'Whether to <b>keep or cut the ad budget</b> going into the festive quarter. Growth says spend more, Finance says payback fails.',
+      journey: {
+        title: 'The journey. An ad is paid for on one day; a customer exists only when a first order is placed.',
+        sub: 'Two tables disagree on who is new: <i>customers</i> has one row per login, and one person can have several.',
+        nodes: ['Ad shown', 'Click', 'Session', 'First order placed', 'Paid or COD', 'Delivered', 'Returned to origin'],
+        back: [6],
+        states: [
+          ['New customer_ids', num(K.j1_new_ids_raw), 'Rows in customers with first order in Aug'],
+          ['New people', num(K.j1_new_all_customers), 'After matching email and phone across ids'],
+          ['Came via marketplace', num(K.j1_new_people_marketplace), 'No ad channel; Amazon, Myntra, Flipkart'],
+          ['First order from paid ads', num(K.j1_new_paid_customers), 'Meta or Google, deduped people', 'acc'],
+          ['Of which never received it', num(K.j1_new_paid_rto), 'First order cancelled or returned to origin'],
+        ],
+      },
+      forks: {
+        title: 'Six forks. Each one moves the number.',
+        rows: [
+          ['What counts as spend', ['Every row in the ad report', 'Latest report per day (restated days once)'], 1],
+          ['Who is new', ['New customer_id', 'New person by email or phone'], 1],
+          ['Who the spend is divided by', ['All new customers (blended)', 'Only those whose first order came from ads'], 1],
+          ['A customer who never got the parcel', ['Counts as acquired', 'Does not count'], 0],
+          ['Whose conversion count', ['What Meta and Google claim', 'Orders in our own data'], 1],
+          ['Which month', ['Spend month = order month', 'Spend leads orders by days'], 0],
+        ],
+        note: 'Bold is what we chose. Fork 4 is the one we report both ways.',
+      },
+      numbers: {
+        title: 'Four numbers the room will bring.', sub: 'Same spend, same month. Highest to lowest is a factor of four.',
+        rows: [
+          ['Growth dashboard', 'Blended CAC', 'All Meta+Google spend / every new customer, including marketplace', L(K.j1_paid_spend), inr(K.j1_blended_cac), K.j1_blended_cac],
+          ['First attempt', 'Naive paid CAC', 'Every ad row summed / new paid customer_ids', '', inr(K.j1_paid_cac_naive), K.j1_paid_cac_naive],
+          ['Our definition', 'Paid CAC', 'Restated spend / new paid people, first order placed', '', inr(K.j1_paid_cac), K.j1_paid_cac, true],
+          ['Finance', 'Paid CAC, delivered', 'Same, counting only people who received their first order', '', inr(K.j1_paid_cac_delivered), K.j1_paid_cac_delivered],
+        ],
+      },
+      def: [
+        ['For', 'Festive-quarter ad budget', 'Is a new paid customer getting cheaper or dearer?'],
+        ['Population', 'People, not ids', 'Email or phone match across customer rows; first ever order in Aug; first order channel paid_social or paid_search'],
+        ['Event', 'First order placed', 'Not cancelled before ship. Delivery is a separate question'],
+        ['Window', '1–31 Aug, order date', 'Spend by spend date, same window'],
+        ['Spend', 'Meta + Google, latest report per day', `${K.j1_restated_rows} Aug days were restated; the first report is dropped`],
+        ['Excludes', 'Marketplace-first buyers, platform-claimed conversions', 'Both would flatter the number'],
+        ['Check', 'July, same definition', `${inr(K.j1_jul_paid_cac)} → ${inr(K.j1_paid_cac)}, ${delta(K.j1_paid_cac, K.j1_jul_paid_cac)}`],
+      ],
+      concl: {
+        k: 'Paid CAC, August', v: inr(K.j1_paid_cac),
+        d: `Up ${delta(K.j1_paid_cac, K.j1_jul_paid_cac)} on July (${inr(K.j1_jul_paid_cac)}). Spend rose ${delta(K.j1_paid_spend, K.j1_jul_paid_spend)}; new paid customers rose only ${delta(K.j1_new_paid_customers, K.j1_jul_new_paid_customers)}.`,
+        checks: [
+          ['Spend after restatement vs every row', `${L(K.j1_paid_spend)} vs ${L(K.j1_paid_spend_naive)}`],
+          ['Meta CPC, Aug', inr(K.j1_meta_cpc)],
+          ['Meta claimed ROAS vs total sales / spend', `${K.j1_meta_roas_claimed.toFixed(1)}× vs ${K.j1_mer.toFixed(1)}×`],
+          ['New paid people who never received order', `${num(K.j1_new_paid_rto)} of ${num(K.j1_new_paid_customers)}`],
+        ],
+        limits: [
+          `<b>Not the whole business.</b> ${num(K.j1_new_people_marketplace)} new people came through marketplaces; no ad spend is attached to them here.`,
+          `<b>Not delivered customers.</b> Count only those who received the parcel and CAC is ${inr(K.j1_paid_cac_delivered)}.`,
+          `<b>Not lifetime value.</b> A dearer customer can still pay back; that needs the repeat pack.`,
+          `<b>Attribution is last-touch.</b> First-order channel from our own data, not the platform's claim.`,
+        ],
+      },
+    },
+
+    // ───────────────────────────── 2. Store conversion
+    {
+      id: 2, name: 'Store funnel', q: 'Did our website convert better or worse in August than in July?',
+      decision: 'Whether to <b>fund a checkout redesign</b>. Product blames the checkout; Marketing blames the traffic.',
+      journey: {
+        title: 'The journey. A session becomes an order in four steps, and not every session is a person.',
+        sub: 'Bots and staff sessions sit in the same table as customers. Purchase events can land days after the session.',
+        nodes: ['Session starts', 'Product viewed', 'Added to cart', 'Checkout started', 'Purchase'],
+        back: [],
+        states: [
+          ['Aug sessions, all', num(K.j2_sessions_eligible / (1 - K.j2_bot_pct / 100)), 'Everything the analytics tool recorded'],
+          ['Bot or internal', pct(K.j2_bot_pct), 'Share of Aug sessions (Jul ' + pct(K.j2_jul_bot_pct) + ')'],
+          ['Real sessions', num(K.j2_sessions_eligible), 'Aug, after removing bots and staff', 'acc'],
+          ['From paid ads', pct(K.j2_paid_session_share), 'Share of real sessions (Jul ' + pct(K.j2_paid_session_share_jul) + ')'],
+          ['Purchase events dated late', num(K.j2_late_purchase_events), 'Recorded after the session day'],
+        ],
+      },
+      forks: {
+        title: 'Five forks.',
+        rows: [
+          ['What is a visit', ['Every session', 'Sessions minus bots and staff'], 1],
+          ['What is a conversion', ['Purchase event in analytics', 'Order in the orders table, matched to the session'], 1],
+          ['Which rate', ['Orders / sessions', 'Purchases / checkouts started', 'Both, separately'], 2],
+          ['Are the months comparable', ['Yes, same site', 'No: sale traffic, more paid, more bots'], 1],
+          ['Which device', ['Blended', 'Mobile and desktop apart'], 0],
+        ],
+        note: 'Bold is what we chose.',
+      },
+      numbers: {
+        title: 'Four ways to say "conversion fell".', sub: 'They agree on the direction and disagree on the size and the cause.',
+        rows: [
+          ['Analytics dashboard', 'All sessions', `Orders / every session. Jul ${pct(K.j2_jul_cvr_all, 2)} → Aug ${pct(K.j2_cvr_all, 2)}`, '', delta(K.j2_cvr_all, K.j2_jul_cvr_all), Math.abs(K.j2_cvr_all - K.j2_jul_cvr_all) / K.j2_jul_cvr_all],
+          ['Our definition', 'Real sessions', `Bots and staff removed. Jul ${pct(K.j2_jul_cvr_eligible, 2)} → Aug ${pct(K.j2_cvr_eligible, 2)}`, '', delta(K.j2_cvr_eligible, K.j2_jul_cvr_eligible), Math.abs(K.j2_cvr_eligible - K.j2_jul_cvr_eligible) / K.j2_jul_cvr_eligible, true],
+          ['Marketing', 'Paid traffic only', `Same traffic type both months. Jul ${pct(K.j2_cvr_paid_jul, 2)} → Aug ${pct(K.j2_cvr_paid, 2)}`, '', delta(K.j2_cvr_paid, K.j2_cvr_paid_jul), Math.abs(K.j2_cvr_paid - K.j2_cvr_paid_jul) / K.j2_cvr_paid_jul],
+          ['Product', 'Checkout completion', `Purchases / checkouts started. Jul ${pct(K.j2_jul_checkout_completion, 1)} → Aug ${pct(K.j2_checkout_completion, 1)}`, '', delta(K.j2_checkout_completion, K.j2_jul_checkout_completion), Math.abs(K.j2_checkout_completion - K.j2_jul_checkout_completion) / K.j2_jul_checkout_completion],
+        ],
+      },
+      def: [
+        ['For', 'Checkout redesign', 'Is the site converting worse, or is different traffic arriving?'],
+        ['Population', 'Real sessions', 'is_bot = 0 and is_internal = 0. Bots were ' + pct(K.j2_bot_pct) + ' in Aug, ' + pct(K.j2_jul_bot_pct) + ' in Jul'],
+        ['Event', 'An order placed in that session', 'From the orders table, not the analytics purchase event'],
+        ['Window', 'Session date, full month', 'July and August, both complete'],
+        ['Rate', 'Orders / real sessions', 'Plus checkout completion as the second lens'],
+        ['Excludes', 'Cancelled? No', 'Conversion is about the site; what happens after is not'],
+        ['Check', 'Paid traffic alone', 'Same traffic type both months still falls ' + delta(K.j2_cvr_paid, K.j2_cvr_paid_jul)],
+      ],
+      concl: {
+        k: 'Conversion, real sessions', v: `${pct(K.j2_cvr_eligible, 2)}`,
+        d: `From ${pct(K.j2_jul_cvr_eligible, 2)} in July, ${delta(K.j2_cvr_eligible, K.j2_jul_cvr_eligible)}. Real, and only partly traffic: paid traffic on its own fell ${delta(K.j2_cvr_paid, K.j2_cvr_paid_jul)}, and checkout completion fell ${delta(K.j2_checkout_completion, K.j2_jul_checkout_completion)}.`,
+        checks: [
+          ['Bot share, Jul → Aug', `${pct(K.j2_jul_bot_pct)} → ${pct(K.j2_bot_pct)}`],
+          ['Paid share of real sessions', `${pct(K.j2_paid_session_share_jul)} → ${pct(K.j2_paid_session_share)}`],
+          ['Mobile vs desktop, Aug', `${pct(K.j2_cvr_mobile, 2)} vs ${pct(K.j2_cvr_desktop, 2)}`],
+          ['Add-to-cart rate, Aug', pct(K.j2_atc_rate)],
+        ],
+        limits: [
+          `<b>Not proof the checkout is broken.</b> Sale shoppers abandon more at checkout too; August had a sale, July did not.`,
+          `<b>Not the same customers.</b> Paid share rose ${pp(K.j2_paid_session_share, K.j2_paid_session_share_jul)}; mix moved even after removing bots.`,
+          `<b>Not revenue.</b> Webstore AOV was ${inr(K.j2_aov_web)}; more orders at lower value is a different conversation.`,
+          `<b>Late events.</b> ${num(K.j2_late_purchase_events)} purchase events carry a later date than their session; use the orders table.`,
+        ],
+      },
+    },
+
+    // ───────────────────────────── 3. On-time delivery
+    {
+      id: 3, name: 'Fulfilment', q: 'What share of our August orders were delivered on time?',
+      decision: 'What to demand at the <b>courier contract renewal</b>. Operations says nine in ten; the inbox says otherwise.',
+      journey: {
+        title: 'The journey. "On time" can be measured at three different doors.',
+        sub: 'Shipped on time is what Ops sees. First attempt is what the courier is paid for. Delivered by the promised date is what the customer feels.',
+        nodes: ['Order placed', 'Promised date set', 'Packed', 'Shipped', 'First attempt', 'Delivered', 'Returned to origin'],
+        back: [6],
+        states: [
+          ['Placed in Aug', num(K.j3_placed_aug), 'Non-test orders, all channels'],
+          ['Delivered', num(K.j3_placed_delivered), 'By the data cutoff'],
+          ['Returned to origin', num(K.j3_placed_rto), 'Never delivered; mostly COD'],
+          ['Cancelled before ship', num(K.j3_placed_cancelled), 'Not a courier outcome'],
+          ['Delivered by promised date', num(K.j3_placed_delivered_by_promise), `${pct(K.j3_edd_hit_placed)} of delivered`, 'acc'],
+        ],
+      },
+      forks: {
+        title: 'Six forks.',
+        rows: [
+          ['Which door is "on time"', ['Shipped within 3 days', 'First attempt by promise', 'Delivered by promised date'], 2],
+          ['Which date to trust', ['Scan date as recorded', 'Actual event date (backdated scans corrected)'], 1],
+          ['Which orders', ['Placed in Aug', 'Delivered in Aug'], 0],
+          ['Orders that never arrived', ['Excluded', 'Counted as not on time'], 0],
+          ['Still in transit at cutoff', ['Excluded', 'Counted as late'], 0],
+          ['One number or many', ['One', 'By warehouse and courier'], 1],
+        ],
+        note: 'Bold is what we chose. Fork 4 is shown both ways on the last slide.',
+      },
+      numbers: {
+        title: 'Four numbers, from nine in ten to seven in ten.', sub: 'Each is a true count of a different door.',
+        rows: [
+          ['Operations dashboard', 'Shipped within 3 days', 'Recorded shipped_date; ' + num(K.j3_backdated_shipped) + ' scans were backdated', '', pct(K.j3_ontime_dashboard), K.j3_ontime_dashboard],
+          ['Courier', 'First attempt by promised date', 'Delivered or RTO orders; customer-not-home is not their fault', '', pct(K.j3_first_attempt_by_promise), K.j3_first_attempt_by_promise],
+          ['Our definition', 'Delivered by promised date', 'Of delivered orders placed in Aug', '', pct(K.j3_edd_hit_placed), K.j3_edd_hit_placed, true],
+          ['Customer', 'Delivered by promise, of all orders', 'RTO and in-transit count as not on time', '', pct(K.j3_edd_hit_all_placed), K.j3_edd_hit_all_placed],
+        ],
+      },
+      def: [
+        ['For', 'Courier renewal', 'Which couriers and lanes miss the promise we made?'],
+        ['Population', 'Orders placed 1–31 Aug', 'Non-test, delivered by cutoff'],
+        ['Event', 'Delivered on or before promised_date', 'Promise is set at order time by tier: 5, 7, 9 days'],
+        ['Window', 'Order date', 'Cohort view: follows August orders into September'],
+        ['Rules', 'Use actual_event_date', 'Shipments table; the orders table carries the scan as recorded'],
+        ['Excludes', 'Cancelled, in transit, RTO', 'Reported separately, not hidden'],
+        ['Check', 'July, same definition', `${pct(K.j3_edd_hit_placed_jul)} → ${pct(K.j3_edd_hit_placed)}`],
+      ],
+      concl: {
+        k: 'Delivered by promised date', v: pct(K.j3_edd_hit_placed, 0),
+        d: `Of orders placed in August and delivered. Down from ${pct(K.j3_edd_hit_placed_jul, 0)} in July. Within two days of the promise: ${pct(K.j3_edd_plus2_placed, 0)}.`,
+        checks: [
+          ['WH-EAST vs WH-NORTH', `${pct(K.j3_edd_hit_east, 0)} vs ${pct(K.j3_edd_hit_north, 0)}`],
+          ['Courier SFX vs DLV', `${pct(K.j3_edd_hit_sfx, 0)} vs ${pct(K.j3_edd_hit_dlv, 0)}`],
+          ['Metro vs tier 3 (promise 5 vs 9 days)', `${pct(K.j3_edd_hit_tier1, 0)} vs ${pct(K.j3_edd_hit_tier3, 0)}`],
+          ['Median order → doorstep', `${K.j3_median_tat} days`],
+        ],
+        limits: [
+          `<b>Not the customer's whole experience.</b> Count RTO and in-transit as failures and it is ${pct(K.j3_edd_hit_all_placed, 0)}.`,
+          `<b>Not one problem.</b> WH-EAST moved to courier SFX on 10 Aug; that lane explains most of the drop.`,
+          `<b>Promise is not standard.</b> Tier 3 has a 9-day promise and hits it; metros have 5 and miss more.`,
+          `<b>${num(K.j3_placed_in_transit)} orders</b> were still moving at cutoff and are not in any bucket.`,
+        ],
+      },
+    },
+
+    // ───────────────────────────── 4. Cost of returns
+    {
+      id: 4, name: 'Reverse', q: 'What did returns cost us in August?',
+      decision: 'Whether to <b>tighten the return policy</b>. Finance wants a shorter window and paid pick-up; Brand says it will cost more than it saves.',
+      journey: {
+        title: 'The journey. Four things look like a return. Only two of them are governed by the return policy.',
+        sub: 'RTO parcels were never delivered; the customer refused or was not home. Exchanges send money nowhere.',
+        nodes: ['Delivered', 'Return requested', 'Picked up', 'Received at warehouse', 'Inspected', 'Refunded or exchanged'],
+        back: [1, 5],
+        states: [
+          ['Customer returns', num(K.j4_n_customer_return), 'Webstore; refund ' + L(K.j4_refund_customer_return)],
+          ['Marketplace returns', num(K.j4_n_marketplace_return), 'Refund ' + L(K.j4_refund_marketplace_return) + '; more arrive for a month'],
+          ['Exchanges', num(K.j4_n_exchange), 'No refund; reverse fee only'],
+          ['Returned to origin', num(K.j4_n_rto), 'Never delivered; ' + pct(K.j4_rto_cod, 0) + ' of COD orders'],
+          ['Reverse flows requested in Aug', num(j4_reverse_total_n), 'All four kinds', 'acc'],
+        ],
+      },
+      forks: {
+        title: 'Six forks.',
+        rows: [
+          ['What is a return', ['Anything that came back', 'Customer-initiated after delivery', 'Both, kept apart'], 2],
+          ['Is a refund a cost', ['Yes, money out', 'No, revenue given back; already out of net revenue'], 1],
+          ['Which costs', ['Reverse pick-up fee only', 'Pick-up + wasted forward + fees + damaged goods'], 1],
+          ['Which month', ['Requested in Aug', 'Received in Aug', 'Refunded in Aug'], 0],
+          ['Exchanges', ['A return', 'A cost without a refund'], 1],
+          ['Marketplace returns', ['Complete', 'Still arriving; say so'], 1],
+        ],
+        note: 'Bold is what we chose.',
+      },
+      numbers: {
+        title: 'Four numbers, from two lakh to fourteen.', sub: 'The largest is not a cost. The smallest is a fifth of the cost.',
+        rows: [
+          ['Finance, first pass', 'Refunds paid', 'Money returned to customers; revenue reversed, not spent', '', L(K.j4_refunds_total_req), K.j4_refunds_total_req],
+          ['Operations', 'Reverse pick-up fees', 'Courier fee for bringing parcels back, all four flows', '', L(K.j4_revfee_total_req), K.j4_revfee_total_req],
+          ['Our definition', 'Out-of-pocket cost of returns', 'Pick-up + wasted forward shipping + fees not recovered + damaged goods', '', L(K.j4_out_of_pocket), K.j4_out_of_pocket, true],
+          ['Growth', 'Refunds plus every cost', 'Adds money given back to money spent', '', L(K.j4_true_reverse_cost), K.j4_true_reverse_cost],
+        ],
+      },
+      def: [
+        ['For', 'Return policy', 'What does the policy control, and what does it cost us?'],
+        ['Population', 'Reverse flows requested 1–31 Aug', 'Customer return, marketplace return, exchange, RTO. Kept apart'],
+        ['Event', 'Return requested', 'Cohort view; RTO dated at the failed delivery'],
+        ['Cost', 'Money spent, not money given back', 'Reverse fee, forward shipping wasted on RTO, marketplace RTO fee, gateway fee not refunded, goods returned damaged'],
+        ['Refunds', 'Shown next to it, not added', L(K.j4_refunds_total_req) + ' already deducted from net revenue'],
+        ['Excludes', 'Lost margin, warehouse labour, customer goodwill', 'Not in the data'],
+        ['Check', 'Reverse fees by month of receipt', `${L(K.j4_reverse_fees)} received Aug vs ${L(K.j4_revfee_total_req)} requested Aug`],
+      ],
+      concl: {
+        k: 'Out-of-pocket cost of returns, August', v: L(K.j4_out_of_pocket),
+        d: `${L(j4_rto_side)} of it is on parcels that never reached the customer (RTO). Only ${L(j4_customer_side)} is on returns the policy can touch. Refunds, ${L(K.j4_refunds_total_req)}, are revenue given back, not cost.`,
+        checks: [
+          ['RTO side: forward shipping + fees', L(j4_rto_side)],
+          ['Customer side: pick-up + gateway + damaged', L(j4_customer_side)],
+          ['Return rate, delivered orders', pct(K.j4_return_rate)],
+          ['Size or fit share of customer returns', pct(K.j4_size_fit_share, 0)],
+        ],
+        limits: [
+          `<b>Not complete.</b> Marketplace returns arrive up to 35 days late; ${num(K.j4_returns_requested_not_closed)} Aug requests are still open.`,
+          `<b>Not the policy's problem.</b> Two-thirds of the cost is COD refusals; a shorter return window does nothing there.`,
+          `<b>Not lost margin.</b> Goods that come back saleable go back to stock; damaged goods are the only write-off counted.`,
+          `<b>Exchanges</b> (${num(K.j4_n_exchange)}) cost a pick-up and refund nothing; they are ${pct(K.j4_exchange_share, 0)} of post-delivery returns.`,
+        ],
+      },
+    },
+
+    // ───────────────────────────── 5. Repeat share
+    {
+      id: 5, name: 'Repeat', q: 'What share of our August sales came from repeat customers?',
+      decision: 'Whether <b>"repeat-led brand"</b> stays in the investor deck.',
+      journey: {
+        title: 'The journey. A repeat customer is a person who bought before. The data has ids, not people.',
+        sub: 'Guest checkout creates a new id every time. Email casing and phone-only records split one person into several.',
+        nodes: ['First order', 'Delivered', 'Comes back', 'Logs in, or checks out as guest', 'Second order', 'Delivered'],
+        back: [],
+        states: [
+          ['Delivered in Aug, excl GST', L(K.j5_delivered_ex_gst), 'The thing "share" is a share of'],
+          ['From ids seen before Aug', L(K.j5_repeat_rev_naive), pct(K.j5_repeat_rev_share_naive) + ' by customer_id'],
+          ['From people seen before Aug', L(K.j5_repeat_rev_dedup), pct(K.j5_repeat_rev_share) + ' by email or phone', 'acc'],
+          ['Hidden repeaters', L(K.j5_hidden_repeat_rev), num(K.j5_hidden_repeat_orders) + ' orders on a new id from a known person'],
+          ['Guest checkouts', pct(K.j5_guest_order_pct), 'Share of Aug orders with no account'],
+        ],
+      },
+      forks: {
+        title: 'Five forks.',
+        rows: [
+          ['Who is one customer', ['One customer_id', 'One email or phone'], 1],
+          ['Share of what', ['Everything placed, incl GST', 'Delivered, excl GST', 'Order count'], 1],
+          ['What is repeat', ['Bought before this month', 'Bought twice within the month'], 0],
+          ['Which month', ['Order placed in Aug', 'Delivered in Aug'], 1],
+          ['Guests', ['New every time', 'Matched by email or phone'], 1],
+        ],
+        note: 'Bold is what we chose.',
+      },
+      numbers: {
+        title: 'Four numbers between 28% and 51%.', sub: 'Three are wrong for the question. One is honest and needs a caveat.',
+        rows: [
+          ['Growth dashboard', 'Repeat share of everything placed', 'Incl GST, cancelled and RTO; by customer_id', '', pct(K.j5_repeat_share_placed_all, 0), K.j5_repeat_share_placed_all],
+          ['First attempt', 'Repeat share by customer_id', 'Delivered, excl GST; ids seen before Aug', '', pct(K.j5_repeat_rev_share_naive, 0), K.j5_repeat_rev_share_naive],
+          ['Our definition', 'Repeat share by person', 'Delivered, excl GST; email or phone seen before Aug', '', pct(K.j5_repeat_rev_share, 0), K.j5_repeat_rev_share, true],
+          ['Another reading', 'Bought twice in August', 'Share of Aug orders from people with 2+ Aug orders', '', pct(K.j5_repeat_share_within_month, 0), K.j5_repeat_share_within_month],
+        ],
+      },
+      def: [
+        ['For', 'Investor claim', 'Is half or more of what we sell bought by people who came back?'],
+        ['Population', 'Orders delivered 1–31 Aug', 'Non-test, excl GST; the same base as net revenue'],
+        ['Event', 'Delivered', 'Sales, not orders placed'],
+        ['Repeat', 'Person first bought before 1 Aug', 'Person = lower-cased email, else normalised phone, across all customer rows'],
+        ['Rules', 'Guests matched the same way', num(K.j5_identity_dup_people) + ' people have more than one customer_id'],
+        ['Excludes', 'Cancelled, RTO, returns', 'Not sales'],
+        ['Check', 'July, same definition', `${pct(K.j5_jul_repeat_rev_share, 0)} → ${pct(K.j5_repeat_rev_share, 0)}`],
+      ],
+      concl: {
+        k: 'Repeat share of August sales', v: pct(K.j5_repeat_rev_share, 0),
+        d: `Half. By customer_id alone it reads ${pct(K.j5_repeat_rev_share_naive, 0)}; ${L(K.j5_hidden_repeat_rev)} of repeat sales hide behind new ids. Down from ${pct(K.j5_jul_repeat_rev_share, 0)} in July because the sale brought first-time buyers.`,
+        checks: [
+          ['Returning people vs first-time people, Aug', `${num(K.j5_repeat_people_aug)} vs ${num(K.j5_new_people_aug)}`],
+          ['Repeat share by order count', pct(K.j5_repeat_share_orders, 0)],
+          ['90-day repeat rate, May cohort', pct(K.j5_90d_repeat_rate, 0)],
+          ['Sale-week first buyers with no later order', pct(K.j5_festive_one_and_done, 0)],
+        ],
+        limits: [
+          `<b>A range, honestly.</b> ${pct(K.j5_repeat_rev_share_naive, 0)}–${pct(K.j5_repeat_rev_share, 0)}: the matching is by email and phone; people who change both are still missed.`,
+          `<b>Not a trend.</b> One sale month moves the mix; July was ${pct(K.j5_jul_repeat_rev_share, 0)}.`,
+          `<b>"Led" is a word, not a number.</b> Half is repeat; half is new. Both are true.`,
+          `<b>Marketplace buyers</b> have no email or phone; they can never be seen as repeat here.`,
+        ],
+      },
+    },
+
+    // ───────────────────────────── 6. Complaints
+    {
+      id: 6, name: 'Support', q: 'Did customer complaints go up in August compared to July?',
+      decision: 'Whether the <b>helpdesk change over the summer</b> broke something, or the floor is hearing growth.',
+      journey: {
+        title: 'The journey. One problem can become several tickets, and not every ticket is a complaint.',
+        sub: 'The helpdesk moved systems in mid-July; both systems logged the same tickets for a week. Replies reopen as new tickets.',
+        nodes: ['Order', 'Problem', 'Customer writes in', 'Ticket created', 'Reply reopens', 'Resolved', 'CSAT'],
+        back: [4],
+        states: [
+          ['Tickets, Aug, as logged', num(K.j6_tickets_naive), 'Every row in the support table'],
+          ['Reopened threads', num(K.j6_reopens_aug), 'Counted as new tickets by the system'],
+          ['Cutover duplicates, Jul', num(K.j6_migration_dupes), 'Same order, day and subject in both systems'],
+          ['Tagged general or other', pct(K.j6_general_tag_pct, 0), 'Not complaints; mistagged questions'],
+          ['Complaints, Aug', num(K.j6_complaint_tags_aug), 'Delivery, refund, quality, wrong item', 'acc'],
+        ],
+      },
+      forks: {
+        title: 'Five forks.',
+        rows: [
+          ['What is a complaint', ['Every ticket', 'Tickets minus reopens and duplicates', 'Only complaint tags'], 2],
+          ['Two systems, one July', ['Sum both', 'Remove the cutover duplicates'], 1],
+          ['Real or growth', ['Raw counts', 'Per 100 delivered orders'], 1],
+          ['Which date', ['Ticket created', 'Order placed'], 0],
+          ['What kind', ['One number', 'By tag, Jul vs Aug'], 1],
+        ],
+        note: 'Bold is what we chose.',
+      },
+      numbers: {
+        title: 'Four numbers, all "up". The size is what matters.', sub: 'Raw counts include growth. Rates do not.',
+        rows: [
+          ['Floor', 'All tickets', `${num(K.j6_jul_tickets_naive)} → ${num(K.j6_tickets_naive)}`, '', delta(K.j6_tickets_naive, K.j6_jul_tickets_naive), Math.abs(K.j6_tickets_naive - K.j6_jul_tickets_naive) / K.j6_jul_tickets_naive],
+          ['Cleaned', 'Tickets, no reopens or duplicates', `${num(K.j6_jul_tickets_dedup)} → ${num(K.j6_tickets_dedup_aug)}`, '', delta(K.j6_tickets_dedup_aug, K.j6_jul_tickets_dedup), Math.abs(K.j6_tickets_dedup_aug - K.j6_jul_tickets_dedup) / K.j6_jul_tickets_dedup],
+          ['Head of CS', 'Contacts per 100 delivered', `${K.j6_jul_contacts_per_100_dedup.toFixed(1)} → ${K.j6_contacts_per_100_dedup.toFixed(1)}`, '', delta(K.j6_contacts_per_100_dedup, K.j6_jul_contacts_per_100_dedup), Math.abs(K.j6_contacts_per_100_dedup - K.j6_jul_contacts_per_100_dedup) / K.j6_jul_contacts_per_100_dedup],
+          ['Our definition', 'Complaints per 100 delivered', `${K.j6_complaints_per_100_jul.toFixed(1)} → ${K.j6_complaints_per_100_aug.toFixed(1)}`, '', delta(K.j6_complaints_per_100_aug, K.j6_complaints_per_100_jul), Math.abs(K.j6_complaints_per_100_aug - K.j6_complaints_per_100_jul) / K.j6_complaints_per_100_jul, true],
+        ],
+      },
+      def: [
+        ['For', 'Helpdesk change', 'Did the rate of complaints rise, and of what kind?'],
+        ['Population', 'Tickets created in the month', 'Both systems; cutover duplicates removed by order, day and subject'],
+        ['Event', 'First ticket of a thread', 'is_reopen = 0'],
+        ['Complaint', 'Tag in delivery_delay, return_refund, quality, wrong_item', 'general and other are questions, not complaints'],
+        ['Rate', 'Per 100 orders delivered in the month', `${num(K.j6_delivered_jul)} → ${num(K.j6_delivered_aug)} delivered`],
+        ['Excludes', 'CSAT', 'Only ' + pct(K.j6_csat_response_pct, 0) + ' of resolved tickets answered it'],
+        ['Check', 'By tag', `Delivery ${num(K.j6_jul_delivery_delay)} → ${num(K.j6_aug_delivery_delay)}; wrong item ${num(K.j6_jul_wrong_item)} → ${num(K.j6_aug_wrong_item)}`],
+      ],
+      concl: {
+        k: 'Complaints per 100 delivered orders', v: `${K.j6_complaints_per_100_jul.toFixed(1)} → ${K.j6_complaints_per_100_aug.toFixed(1)}`,
+        d: `Up ${delta(K.j6_complaints_per_100_aug, K.j6_complaints_per_100_jul)} after removing growth, reopens and the system cutover. Real, and led by delivery delays and wrong items.`,
+        checks: [
+          ['Delivery-delay tickets, Jul → Aug', `${num(K.j6_jul_delivery_delay)} → ${num(K.j6_aug_delivery_delay)}`],
+          ['Wrong-item tickets', `${num(K.j6_jul_wrong_item)} → ${num(K.j6_aug_wrong_item)}`],
+          ['Delivery-delay tickets on WH-EAST orders', `${pct(K.j6_wismo_east_share, 0)} vs ${pct(K.j6_east_order_share, 0)} of orders`],
+          ['Median first response', `${K.j6_frt_median} hours`],
+        ],
+        limits: [
+          `<b>Not the helpdesk's fault.</b> The rise is in delivery and picking, not in how tickets are handled.`,
+          `<b>Tags are hand-written.</b> ${pct(K.j6_general_tag_pct, 0)} of tickets sit in "general"; some are complaints in disguise.`,
+          `<b>Not satisfaction.</b> CSAT ${K.j6_csat_mean.toFixed(1)} from ${pct(K.j6_csat_response_pct, 0)} of tickets is the unhappy and the delighted, not the middle.`,
+          `<b>August's sale</b> raised volume; per-order rate is the fair comparison, but sale buyers may complain more.`,
+        ],
+      },
+    },
+
+    // ───────────────────────────── 7. Gross margin
+    {
+      id: 7, name: 'Pricing and margin', q: 'What was our gross margin in August?',
+      decision: 'The <b>board pack</b>. What we keep on each sale after the August sale.',
+      journey: {
+        title: 'The journey. From list price to what we keep, in seven steps.',
+        sub: 'Two cost tables exist: the old standard cost and a revision that applies from 1 July. Only one is right for August.',
+        nodes: ['List price', 'Discount', 'GST', 'Delivered', 'Cost of goods', 'Returns back', 'Fees and shipping'],
+        back: [5],
+        states: [
+          ['Delivered, at list price', L(K.j7_mrp_value), 'MRP × units'],
+          ['Delivered, incl GST', L(K.j7_delivered_incl_gst), 'What customers paid'],
+          ['Delivered, excl GST', L(K.j7_delivered_ex_gst), 'Sales; GST is not ours'],
+          ['Cost of goods, current cost', L(K.j7_cogs_v2), 'Cost v2; v1 would be ' + L(K.j7_cogs_v1)],
+          ['Gross margin', L(K.j7_gm_v2), pct(K.j7_cm1_v2) + ' before returns', 'acc'],
+        ],
+      },
+      forks: {
+        title: 'Six forks.',
+        rows: [
+          ['What is "sold"', ['Placed', 'Delivered', 'Delivered minus returns received'], 2],
+          ['Which price', ['List price (MRP)', 'Price paid incl GST', 'Price paid excl GST'], 2],
+          ['Which cost', ['Cost v1 (last board pack)', 'Cost v2 (current, from 1 Jul)'], 1],
+          ['Returns', ['Ignore', 'Refund out, saleable goods back to stock'], 1],
+          ['Shipping, fees, commission', ['In gross margin', 'Below it, in contribution'], 1],
+          ['Comparison', ['Aug alone', 'Aug vs Jul, same cost version'], 1],
+        ],
+        note: 'Bold is what we chose.',
+      },
+      numbers: {
+        title: 'Five margins between 35% and 70%.', sub: 'Every one of them is called "margin" by someone in the building.',
+        rows: [
+          ['Merchandising', 'Margin on list price', 'MRP less cost; ignores discounts', '', pct(K.j7_gm_pct_mrp_v2, 0), K.j7_gm_pct_mrp_v2],
+          ['Growth dashboard', 'Margin on price incl GST', 'Treats GST as revenue', '', pct(K.j7_gm_pct_incl_gst_v2, 0), K.j7_gm_pct_incl_gst_v2],
+          ['Last board pack', 'Gross margin, old cost', 'Cost v1, before the costing review', '', pct(K.j7_cm1_v1, 0), K.j7_cm1_v1],
+          ['Our definition', 'Gross margin after returns', 'Delivered excl GST less returns received, less current cost of goods', '', pct(K.j7_gm_after_returns_pct, 0), K.j7_gm_after_returns_pct, true],
+          ['Finance', 'Contribution', 'After fulfilment, marketplace fees, payment fees', '', pct(K.j7_contribution_pct, 0), K.j7_contribution_pct],
+        ],
+      },
+      def: [
+        ['For', 'Board pack', 'What we keep on each sale, comparable with last month'],
+        ['Sold', 'Delivered in Aug, excl GST, less returns received in Aug', `${L(K.j7_delivered_ex_gst)} − ${L(K.j7_refunds_received_aug)} = ${L(j7_net_rev)}`],
+        ['Cost', 'Cost v2 × units delivered', `${L(K.j7_cogs_v2)}; saleable returns come back at cost, ${L(K.j7_returned_cogs_aug)}`],
+        ['Window', 'Delivery date', 'Same base as net revenue'],
+        ['Rules', 'Cost v2 for both months', 'v1 is not wrong; it is a different vintage. Never mix'],
+        ['Excludes', 'Fulfilment, fees, commission, ads', 'Contribution, shown next to it'],
+        ['Check', 'July, cost v2, before returns', `${pct(K.j7_jul_cm1_v2, 1)} → ${pct(K.j7_cm1_v2, 1)}`],
+      ],
+      concl: {
+        k: 'Gross margin after returns, August', v: pct(K.j7_gm_after_returns_pct, 1),
+        d: `${L(K.j7_gm_after_returns_v2)} on ${L(j7_net_rev)} of net sales. Before returns ${pct(K.j7_cm1_v2, 1)}, against ${pct(K.j7_jul_cm1_v2, 1)} in July: the sale cost ${pp(K.j7_cm1_v2, K.j7_jul_cm1_v2).replace('−', '')} of margin.`,
+        checks: [
+          ['Discount depth, Aug delivered', pct(K.j7_discount_depth, 0) + ' off list'],
+          ['Cost revision v1 → v2', '+' + pct(K.j7_cost_v2_uplift_pct, 0)],
+          ['Marketplace commission and fees', L(K.j7_mkt_commission_delivered)],
+          ['Contribution after all fees', `${L(K.j7_contribution_v2)} · ${pct(K.j7_contribution_pct, 0)}`],
+        ],
+        limits: [
+          `<b>Not profit.</b> Ads (${L(K.j1_paid_spend)}), salaries, rent and returns handling are not in it.`,
+          `<b>Not "down 200 bps" against the old pack.</b> Half of that gap is the cost revision, not the sale.`,
+          `<b>Not final.</b> Marketplace returns for August arrive into September.`,
+          `<b>Apparel is ${pct(K.j7_apparel_mix_pct, 0)}</b> of sales; a category view would show the sale's real depth.`,
+        ],
+      },
+    },
+
+    // ───────────────────────────── 8. Stock-out
+    {
+      id: 8, name: 'Availability', q: 'How much did the August stock-out of our hero products cost us?',
+      decision: 'Whether to <b>fund a much larger safety stock</b> on hero products.',
+      journey: {
+        title: 'The journey. Lost sales are never in the data. They are the gap between what happened and what should have.',
+        sub: 'Hero products ran out at two of four warehouses, 21–24 August, in the middle of the sale. Views kept coming.',
+        nodes: ['Stock snapshot', 'Sellable', 'Product viewed', 'Add to cart', 'Order', 'Out of stock', 'Restocked'],
+        back: [5],
+        states: [
+          ['Hero units, 10–19 Aug', num(K.j8_hero_units_pre), 'All warehouses, before the stock-out'],
+          ['Of which East + West', num(K.j8_hero_units_pre_ew), 'The two warehouses that ran out'],
+          ['Sold 21–24 Aug, East + West', num(K.j8_hero_units_oos_ew), 'Should be about zero. It is'],
+          ['Sold 21–24 Aug, North + South', num(K.j8_hero_units_oos), 'Kept selling, at ' + K.j8_sale_uplift_ns.toFixed(1) + '× the pre-sale rate'],
+          ['Hero views during stock-out', num(K.j8_hero_views_oos), 'Demand was there: ' + num(K.j8_hero_views_pre) + ' in the ten days before', 'acc'],
+        ],
+      },
+      forks: {
+        title: 'Six forks.',
+        rows: [
+          ['What is "out of stock"', ['sellable = 0', 'sellable = 0 and on_hand = 0 (blocked stock is not gone)'], 1],
+          ['Where', ['Whole company', 'The two warehouses that ran out'], 1],
+          ['What would we have sold', ['Pre-sale run rate', 'Run rate × what the other warehouses did in the same days'], 1],
+          ['Value of a lost unit', ['List price', 'Price paid excl GST', 'Margin'], 1],
+          ['Missing snapshot days', ['Treat as zero stock', 'Treat as unknown'], 1],
+          ['Substitution', ['None', 'Some buyers bought something else'], 1],
+        ],
+        note: 'Bold is what we chose.',
+      },
+      numbers: {
+        title: 'Three numbers. All estimates. One is honest about it.', sub: 'The stock-out is a fact; the cost of it is a counterfactual.',
+        rows: [
+          ['Supply chain', 'Naive lost units', `Company run rate × 4 days. ${num(K.j8_hero_lost_units_naive)} units, counts warehouses that kept selling`, '', L(K.j8_hero_lost_revenue_naive), K.j8_hero_lost_revenue_naive],
+          ['Our definition', 'Lost sales, East + West', `${num(K.j8_hero_lost_units_est)} units × ${inr(K.j8_hero_asp_ex)} ex-GST; run rate lifted by the sale as seen at North + South`, '', L(K.j8_hero_lost_revenue_est), K.j8_hero_lost_revenue_est, true],
+          ['Finance', 'Lost margin', 'Same units at gross margin, not at price', '', L(K.j8_hero_lost_revenue_est * K.j7_cm1_v2 / 100), K.j8_hero_lost_revenue_est * K.j7_cm1_v2 / 100],
+        ],
+      },
+      def: [
+        ['For', 'Safety stock decision', 'What did four days without heroes at two warehouses cost in sales?'],
+        ['Population', 'Hero SKUs at WH-EAST and WH-WEST', 'Where sellable and on_hand were both zero, 21–24 Aug'],
+        ['Baseline', 'Units per day, 10–19 Aug, same SKUs, same warehouses', num(K.j8_hero_units_pre_ew) + ' units in ten days'],
+        ['Uplift', 'North + South rate in the stock-out days ÷ their pre-sale rate', K.j8_sale_uplift_ns.toFixed(2) + '×, the sale effect'],
+        ['Lost units', 'Baseline × uplift × 4 days − units actually sold', num(K.j8_hero_lost_units_est) + ' units'],
+        ['Value', 'Ex-GST price per hero unit, 10–19 Aug', inr(K.j8_hero_asp_ex)],
+        ['Check', 'Blocked rows that look like stock-outs', num(K.j8_phantom_hero_rows_aug) + ' hero rows had stock on hand'],
+      ],
+      concl: {
+        k: 'Lost hero sales, 21–24 August', v: L(K.j8_hero_lost_revenue_est),
+        d: `About ${num(K.j8_hero_lost_units_est)} units at two warehouses. An estimate: the baseline is fact, the uplift is borrowed from the other two warehouses, the value is at price, not margin.`,
+        checks: [
+          ['Naive estimate, whole company', `${L(K.j8_hero_lost_revenue_naive)} · ${num(K.j8_hero_lost_units_naive)} units`],
+          ['Hero views, stock-out days vs before', `${num(K.j8_hero_views_oos)} vs ${num(K.j8_hero_views_pre)}`],
+          ['Hero sellable at WH-EAST, 22 Aug', num(K.j8_hero_fill_wh_east)],
+          ['Snapshot days missing in the window', num(K.j8_stock_missing_dates)],
+        ],
+        limits: [
+          `<b>Not margin.</b> At gross margin the loss is about ${L(K.j8_hero_lost_revenue_est * K.j7_cm1_v2 / 100)}.`,
+          `<b>Not net of substitution.</b> Some shoppers bought another product; the data cannot say how many.`,
+          `<b>Not the cost of the fix.</b> Safety stock ties up cash every month; this is four days, once.`,
+          `<b>${num(K.j8_phantom_hero_rows_aug)} "stock-outs" were not.</b> Blocked stock with units on hand is a warehouse flag, not a lost sale.`,
+        ],
+      },
+    },
+  ];
+
+  // ── Rendering
+  const stage = document.getElementById('stage');
+  const add = html => stage.insertAdjacentHTML('beforeend', html);
+  const mark = p => `<span class="packmark">Pack ${p.id} · ${p.name}</span>`;
+  const step = s => `<span class="stepmark">${s}</span>`;
+
+  add(`<section class="slide center">
+    <div class="cover">
+      <div>
+        <h1>Eight questions. Eight numbers you can defend.</h1>
+        <div class="cover-meta"><span>Decision Makers Club · Session 01</span><span>Answer keys, shown after the teams present</span></div>
+      </div>
+      <div class="block"></div>
+    </div>
+    <span class="pg"></span>
+  </section>`);
+
+  add(`<section class="slide">
+    <h2>Each pack, six slides. The same seven steps as revenue.<small>The number at the end is one defensible answer, not the only one. A team that chose differently and said why has done the work.</small></h2>
+    <div class="body"><div class="tiles">
+      <div class="tile"><span class="n">01 · 02</span><b>The question and the journey<small>What decision it serves. The steps a customer takes and the states an order ends in, with counts.</small></b></div>
+      <div class="tile"><span class="n">03</span><b>The forks<small>Where a reasonable person could choose differently. Bold is our choice.</small></b></div>
+      <div class="tile"><span class="n">04</span><b>The numbers the room brings<small>Each labelled with who would produce it and why.</small></b></div>
+      <div class="tile"><span class="n">05 · 06</span><b>Definition, check, limits<small>Seven lines anyone can recompute. What we checked it against. What it does not prove.</small></b></div>
+    </div></div>
+    <span class="pg"></span>
+  </section>`);
+
+  add(`<section class="slide">
+    <h2>The eight answers on one page.</h2>
+    <div class="body"><div class="index">
+      ${PACKS.map(p => `<div><span class="n">0${p.id}</span><b>${p.q}</b><span>${p.concl.v}</span></div>`).join('')}
+    </div></div>
+    <span class="pg"></span>
+  </section>`);
+
+  PACKS.forEach(p => {
+    // 1. question
+    add(`<section class="slide center q">${mark(p)}
+      <div><h2>${p.q}</h2><p class="from">Message from the CEO · Pack ${p.id}</p>
+      <p class="decision">Decision: ${p.decision}</p></div>
+      ${step('Step 1 · The decision')}<span class="pg"></span></section>`);
+    // 2. journey
+    const J = p.journey;
+    add(`<section class="slide">${mark(p)}
+      <h2>${J.title}<small>${J.sub}</small></h2>
+      <div class="body">
+        <div class="flow" style="grid-template-columns: repeat(${J.nodes.length}, 1fr)">
+          ${J.nodes.map((n, i) => `<div class="node ${J.back.includes(i) ? 'back' : ''}"><time>${String(i + 1).padStart(2, '0')}</time><b>${n}</b></div>`).join('')}
+        </div>
+        <div class="states" style="grid-template-columns: repeat(${J.states.length}, 1fr)">
+          ${J.states.map(s => `<div class="state ${s[3] || ''}"><span class="k">${s[0]}</span><span class="v">${s[1]}</span><span class="d">${s[2]}</span></div>`).join('')}
+        </div>
+      </div>
+      ${step('Step 2 · Journey and states')}<span class="pg"></span></section>`);
+    // 3. forks
+    const F = p.forks;
+    add(`<section class="slide">${mark(p)}
+      <h2>${F.title}<small>${F.note}</small></h2>
+      <div class="body"><div class="forks">
+        ${F.rows.map((r, i) => `<div class="fork"><span class="n">0${i + 1}</span><span class="k">${r[0]}</span>
+          <span class="opts">${r[1].map((o, k) => `<span class="opt ${k === r[2] ? 'on' : ''}">${o}</span>`).join('')}</span></div>`).join('')}
+      </div></div>
+      ${step('Step 3 · Forks')}<span class="pg"></span></section>`);
+    // 4. numbers
+    const N = p.numbers; const mx = Math.max(...N.rows.map(r => r[5]));
+    add(`<section class="slide">${mark(p)}
+      <h2>${N.title}<small>${N.sub}</small></h2>
+      <div class="body"><div class="bars">
+        ${N.rows.map(r => `<div class="lbl"><span class="team">${r[0]}</span>${r[1]}<small>${r[2]}</small></div>
+          <div><div class="bar ${r[6] ? 'hi' : ''}" style="width:${Math.max(3, 100 * r[5] / mx)}%"></div></div>
+          <div class="val ${r[6] ? 'hi' : ''}">${r[4]}</div>`).join('')}
+      </div></div>
+      ${step('Step 4 · Why the numbers differ')}<span class="pg"></span></section>`);
+    // 5. definition
+    add(`<section class="slide">${mark(p)}
+      <h2>The definition. Seven lines anyone can recompute.</h2>
+      <div class="body"><div class="defs">
+        ${p.def.map((d, i) => `<div class="def"><span class="n">0${i + 1}</span><span class="k">${d[0]}</span><span class="v">${d[1]}<small>${d[2]}</small></span></div>`).join('')}
+      </div></div>
+      ${step('Step 5 · Definition')}<span class="pg"></span></section>`);
+    // 6. conclusion
+    const C = p.concl;
+    add(`<section class="slide">${mark(p)}
+      <h2>The answer, what we checked, and what it does not prove.</h2>
+      <div class="body"><div class="concl">
+        <div>
+          <div class="bignum"><span class="k">${C.k}</span><span class="v">${C.v}</span><span class="d">${C.d}</span></div>
+          <div class="checklist"><span class="hd">Checked against</span>
+            ${C.checks.map(c => `<div><span>${c[0]}</span><span>${c[1]}</span></div>`).join('')}
+          </div>
+        </div>
+        <div class="limits"><span class="k">What this number does not prove</span>
+          ${C.limits.map(l => `<p>${l}</p>`).join('')}
+        </div>
+      </div></div>
+      ${step('Steps 6 and 7 · Check, conclude')}<span class="pg"></span></section>`);
+  });
+
+  add(`<section class="slide">
+    <h2>What the eight packs have in common.<small>Every wrong number in this room was a right number for a different question.</small></h2>
+    <div class="body"><div class="tiles">
+      <div class="tile"><span class="n">01</span><b>Two tables, one truth<small>ids vs people; scan date vs actual; cost v1 vs v2; two helpdesks. The data never says which is right. The decision does.</small></b></div>
+      <div class="tile"><span class="n">02</span><b>The window is a choice<small>Placed, delivered, requested, refunded. Pick the event that matches the decision and say which one you picked.</small></b></div>
+      <div class="tile"><span class="n">03</span><b>Rates beat counts<small>Growth makes every count go up. Per order, per session, per delivered parcel is the fair comparison.</small></b></div>
+      <div class="tile"><span class="n">04</span><b>Say what it does not prove<small>Not cash, not profit, not final, not the whole business. The limits are part of the number.</small></b></div>
+    </div></div>
+    <span class="pg"></span>
+  </section>`);
+
+  // Deck mechanics
+  const slides = [...document.querySelectorAll('.slide')];
+  slides.forEach((s, i) => { const p = s.querySelector('.pg'); if (p) p.textContent = String(i + 1).padStart(2, '0') + ' / ' + slides.length; });
+  const startAt = parseInt(new URLSearchParams(location.search).get('s'), 10) || parseInt(location.hash.slice(1), 10) || 1;
+  let index = Math.max(0, Math.min(slides.length - 1, startAt - 1));
+  function fit() { stage.style.setProperty('--s', Math.min(innerWidth / 1920, innerHeight / 1080)); }
+  function show(i) {
+    index = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((el, k) => el.classList.toggle('active', k === index));
+    try { history.replaceState(null, '', '#' + (index + 1)); } catch (e) {}
+  }
+  addEventListener('resize', fit); fit(); show(index);
+  document.querySelector('[data-prev]').addEventListener('click', () => show(index - 1));
+  document.querySelector('[data-next]').addEventListener('click', () => show(index + 1));
+  addEventListener('keydown', e => {
+    if (new URLSearchParams(location.search).has('static')) return;
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); show(index + 1); }
+    if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); show(index - 1); }
+    if (e.key === 'Home') show(0);
+    if (e.key === 'End') show(slides.length - 1);
+    if (e.key === 'f') document.documentElement.requestFullscreen?.();
+  });
+</script>
+</body>
+</html>

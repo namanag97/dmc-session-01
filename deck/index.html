@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How do we get the right data for business decisions?</title>
+<style>
+  @font-face { font-family: Geist; src: url("./right-data-assets/Geist-Regular.woff2") format("woff2"); font-weight: 400; }
+  @font-face { font-family: Geist; src: url("./right-data-assets/Geist-Bold.woff2") format("woff2"); font-weight: 700; }
+  @font-face { font-family: "Geist Mono"; src: url("./right-data-assets/GeistMono-Regular.woff2") format("woff2"); font-weight: 400; }
+  @font-face { font-family: "Geist Mono"; src: url("./right-data-assets/GeistMono-SemiBold.woff2") format("woff2"); font-weight: 600; }
+
+  :root {
+    --paper: #ffffff; --tint: #f3f4f6; --ink: #111318; --muted: #6b7280;
+    --rule: #d6d9df; --soft: #e7e9ee; --accent: #1d4ed8;
+    --sans: Geist, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --mono: "Geist Mono", "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 100%; height: 100%; background: #e5e7eb; overflow: hidden; }
+  body { font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: antialiased; }
+  h1, h2, h3, p { margin: 0; }
+  button { font: inherit; }
+
+  .stage { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform: translate(-50%, -50%) scale(var(--s, 1)); transform-origin: center; background: var(--paper); box-shadow: 0 30px 80px rgba(0,0,0,.18); }
+  .slide { position: absolute; inset: 0; display: none; padding: 110px 112px 96px; grid-template-rows: auto 1fr; row-gap: 64px; background: var(--paper); }
+  .slide.active { display: grid; }
+  .slide.center { grid-template-rows: 1fr; align-items: center; }
+  .pg { position: absolute; right: 112px; bottom: 44px; font: 600 15px/1 var(--mono); color: var(--muted); letter-spacing: .06em; }
+  .stepmark { position: absolute; left: 112px; bottom: 44px; font: 600 15px/1 var(--mono); color: var(--accent); letter-spacing: .08em; text-transform: uppercase; }
+
+  h1 { font-size: 136px; line-height: .94; letter-spacing: -.05em; font-weight: 700; max-width: 13ch; }
+  h2 { font-size: 66px; line-height: 1; letter-spacing: -.04em; font-weight: 700; max-width: 26ch; }
+  h2 .accent { color: var(--accent); }
+  h2 small { display: block; margin-top: 22px; font-size: 29px; line-height: 1.3; font-weight: 400; letter-spacing: -.01em; color: var(--muted); max-width: 44ch; }
+  .body { min-height: 0; display: grid; align-content: center; }
+  .accent { color: var(--accent); }
+  .mono { font-family: var(--mono); }
+
+  .cover { display: grid; grid-template-columns: 1fr 340px; column-gap: 72px; align-items: end; }
+  .cover .block { background: var(--accent); height: 440px; }
+  .cover-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--ink); font-size: 24px; }
+  .cover-meta span:last-child { color: var(--muted); }
+
+  .chain { display: grid; grid-template-columns: repeat(5, 1fr); gap: 28px; }
+  .chain .step { border-top: 3px solid var(--ink); padding-top: 26px; }
+  .chain .step.hi { border-top-color: var(--accent); }
+  .chain .n { font: 600 15px/1 var(--mono); color: var(--muted); }
+  .chain .t { display: block; margin-top: 20px; font-size: 46px; font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+  .chain .hi .t { color: var(--accent); }
+  .chain .d { display: block; margin-top: 18px; font-size: 24px; line-height: 1.3; color: var(--muted); max-width: 18ch; }
+
+  .q h2 { font-size: 128px; letter-spacing: -.05em; max-width: 12ch; }
+  .q .from { margin-top: 40px; font: 600 18px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+  .bars { display: grid; grid-template-columns: 340px 1fr 420px; row-gap: 26px; column-gap: 48px; align-items: center; }
+  .bars .lbl { font-size: 36px; font-weight: 700; letter-spacing: -.02em; }
+  .bars .lbl small { display: block; font-size: 20px; font-weight: 400; color: var(--muted); margin-top: 6px; }
+  .bars .bar { height: 72px; background: var(--ink); }
+  .bars .bar.lo { background: var(--soft); }
+  .bars .val { font: 600 42px/1 var(--mono); text-align: right; letter-spacing: -.02em; }
+
+  .stmts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 56px; }
+  .stmts div { border-top: 3px solid var(--ink); padding-top: 30px; }
+  .stmts .n { font: 600 15px/1 var(--mono); color: var(--muted); }
+  .stmts p { margin-top: 22px; font-size: 42px; line-height: 1.12; font-weight: 700; letter-spacing: -.03em; }
+  .stmts .hi { border-top-color: var(--accent); }
+  .stmts .hi p { color: var(--accent); }
+
+  .months { display: grid; grid-template-columns: 1fr 2.4fr 1fr; gap: 24px; }
+  .month { border-top: 3px solid var(--ink); padding-top: 20px; }
+  .month.aug { border-top-color: var(--accent); background: var(--tint); padding: 20px 32px 32px; }
+  .month .mn { font: 600 18px/1 var(--mono); letter-spacing: .08em; }
+  .month.aug .mn { color: var(--accent); }
+  .month .cnt { font: 400 15px/1 var(--mono); color: var(--muted); margin-left: 14px; }
+  .evs { margin-top: 28px; display: grid; gap: 12px; }
+  .month.aug .evs { grid-template-columns: 1fr 1fr; column-gap: 48px; }
+  .ev { display: grid; grid-template-columns: 90px 1fr; align-items: baseline; gap: 20px; padding: 16px 0; border-bottom: 1px solid var(--rule); }
+  .ev time { font: 600 17px/1 var(--mono); color: var(--muted); }
+  .ev b { font-size: 26px; letter-spacing: -.02em; line-height: 1.05; }
+  .ev.back b, .ev.back time { color: var(--accent); }
+  .legend { margin-top: 36px; font-size: 22px; color: var(--muted); }
+
+  .pairs { border-top: 3px solid var(--ink); }
+  .pairs .hd, .pairs .row { display: grid; grid-template-columns: 1fr 1fr; column-gap: 72px; }
+  .pairs .hd { padding: 20px 0 18px; border-bottom: 1px solid var(--ink); font: 600 15px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .pairs .row { padding: 24px 0; border-bottom: 1px solid var(--rule); font-size: 34px; line-height: 1.05; letter-spacing: -.02em; }
+  .pairs .row span:first-child { font-weight: 700; }
+  .pairs.arrow .row span:last-child { position: relative; padding-left: 60px; }
+  .pairs.arrow .row span:last-child::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
+
+  .defs { border-top: 3px solid var(--ink); }
+  .def { display: grid; grid-template-columns: 60px 280px 1fr; align-items: center; gap: 32px; min-height: 96px; border-bottom: 1px solid var(--rule); }
+  .def .n { font: 600 15px/1 var(--mono); color: var(--accent); }
+  .def .k { font: 600 20px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+  .def .v { font-size: 34px; font-weight: 700; letter-spacing: -.02em; line-height: 1.05; }
+  .def .v small { display: block; margin-top: 8px; font-size: 21px; font-weight: 400; color: var(--muted); }
+
+  .views { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; }
+  .view { border-top: 3px solid var(--ink); padding-top: 26px; }
+  .view h3 { font-size: 54px; letter-spacing: -.035em; line-height: 1; }
+  .view p { margin-top: 20px; font-size: 27px; line-height: 1.3; color: var(--muted); max-width: 26ch; }
+  .strip { margin-top: 44px; display: grid; grid-template-columns: repeat(3, 1fr); position: relative; }
+  .strip .m { border-top: 1px solid var(--rule); padding-top: 12px; font: 600 15px/1 var(--mono); letter-spacing: .08em; color: var(--muted); }
+  .strip .m.on { color: var(--accent); }
+  .lanes { grid-column: 1 / -1; margin-top: 20px; display: grid; gap: 14px; }
+  .lane { position: relative; height: 36px; background: var(--tint); }
+  .lane i { position: absolute; top: 0; bottom: 0; background: var(--soft); }
+  .lane i.on { background: var(--ink); }
+  .lane i.acc { background: var(--accent); }
+  .strip .win { position: absolute; top: 0; bottom: -20px; left: 33.33%; width: 33.33%; border-left: 2px dashed var(--accent); border-right: 2px dashed var(--accent); pointer-events: none; }
+  .view .cap { margin-top: 24px; font-size: 24px; line-height: 1.3; color: var(--ink); }
+
+  .path { display: grid; grid-template-columns: repeat(3, 1fr); gap: 44px; }
+  .band { border-top: 3px solid var(--ink); padding-top: 20px; }
+  .band .bt { font: 600 15px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .band.acc { border-top-color: var(--accent); }
+  .band.acc .bt { color: var(--accent); }
+  .steps { margin-top: 26px; display: grid; gap: 12px; }
+  .steps div { display: grid; grid-template-columns: 48px 1fr; gap: 16px; align-items: baseline; padding: 20px 0; border-bottom: 1px solid var(--rule); }
+  .steps .n { font: 600 16px/1 var(--mono); color: var(--muted); }
+  .steps b { font-size: 34px; letter-spacing: -.025em; line-height: 1; }
+
+  .eq { display: grid; grid-template-columns: 1fr 88px 1fr 88px 1fr; }
+  .eq .op { display: grid; place-items: center; font-size: 76px; font-weight: 700; color: var(--muted); }
+  .eq .term { border-top: 3px solid var(--ink); padding-top: 28px; }
+  .eq .term b { display: block; font-size: 54px; letter-spacing: -.035em; line-height: 1; }
+  .eq .term p { margin-top: 22px; font-size: 26px; line-height: 1.3; color: var(--muted); }
+  .eq .fail { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--rule); font-size: 26px; line-height: 1.3; }
+  .eq .fail::before { content: "Fails when"; display: block; font: 600 13px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  .tile { background: var(--tint); padding: 36px; min-height: 300px; display: grid; align-content: space-between; }
+  .tile .n { font: 600 15px/1 var(--mono); color: var(--muted); }
+  .tile b { font-size: 44px; letter-spacing: -.03em; line-height: 1.02; }
+  .tile b small { display: block; margin-top: 14px; font-size: 24px; font-weight: 400; color: var(--muted); line-height: 1.3; }
+  .tile.acc { background: var(--ink); color: #fff; }
+  .tile.acc .n { color: #9ca3af; }
+  .tile.acc b small { color: #c7cbd3; }
+
+  .num2 { display: grid; grid-template-columns: 1fr 1fr; column-gap: 88px; border-top: 3px solid var(--ink); }
+  .num2 > div { display: grid; grid-template-columns: 72px 1fr; align-items: baseline; gap: 20px; padding: 32px 0; border-bottom: 1px solid var(--rule); }
+  .num2 > div:empty { border-bottom: 0; }
+  .num2 .n { font: 600 22px/1 var(--mono); color: var(--accent); }
+  .num2 b { font-size: 38px; letter-spacing: -.025em; line-height: 1.05; }
+
+  /* Worked example: journey + states */
+  .flow { display: grid; grid-template-columns: repeat(8, 1fr); gap: 14px; }
+  .flow .node { border-top: 3px solid var(--ink); padding-top: 18px; position: relative; }
+  .flow .node::after { content: "→"; position: absolute; right: -14px; top: -22px; font-size: 22px; color: var(--muted); }
+  .flow .node:last-child::after { content: ""; }
+  .flow .node.back { border-top-color: var(--accent); }
+  .flow .node time { display: block; font: 600 14px/1 var(--mono); color: var(--muted); }
+  .flow .node b { display: block; margin-top: 12px; font-size: 26px; letter-spacing: -.02em; line-height: 1.05; }
+  .flow .node.back b { color: var(--accent); }
+  .states { margin-top: 56px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; }
+  .state { background: var(--tint); padding: 24px 26px; }
+  .state .k { font: 600 14px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .state .v { display: block; margin-top: 14px; font: 600 40px/1 var(--mono); letter-spacing: -.03em; }
+  .state .d { display: block; margin-top: 10px; font-size: 19px; color: var(--muted); line-height: 1.3; }
+  .state.acc { background: var(--ink); color: #fff; }
+  .state.acc .k, .state.acc .d { color: #c7cbd3; }
+
+  /* Forks */
+  .forks { border-top: 3px solid var(--ink); }
+  .fork { display: grid; grid-template-columns: 60px 360px 1fr; align-items: center; gap: 32px; min-height: 92px; border-bottom: 1px solid var(--rule); }
+  .fork .n { font: 600 15px/1 var(--mono); color: var(--accent); }
+  .fork .k { font-size: 30px; font-weight: 700; letter-spacing: -.02em; line-height: 1.05; }
+  .fork .opts { display: flex; flex-wrap: wrap; gap: 12px; }
+  .fork .opt { padding: 10px 16px; border: 1px solid var(--rule); font-size: 22px; line-height: 1; color: var(--muted); }
+  .fork .opt.on { border-color: var(--ink); color: var(--ink); font-weight: 700; }
+
+  /* Bridge */
+  .bridge { display: grid; grid-template-columns: 640px 1fr 300px; column-gap: 40px; row-gap: 6px; align-items: center; }
+  .bridge .l { font-size: 22px; line-height: 1.1; letter-spacing: -.01em; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; min-height: 40px; }
+  .bridge .l.total { min-height: 60px; border-top: 1px solid var(--rule); padding-top: 8px; }
+  .bridge .l b { font-size: 28px; letter-spacing: -.02em; }
+  .bridge .l small { font-size: 17px; color: var(--muted); }
+  .bridge .track { position: relative; height: 44px; }
+  .bridge .track i { position: absolute; top: 0; bottom: 0; }
+  .bridge .total .track i { background: var(--ink); }
+  .bridge .total.acc .track i { background: var(--accent); }
+  .bridge .delta .track { height: 24px; }
+  .bridge .delta .track i { background: var(--soft); border-left: 2px solid var(--muted); }
+  .bridge .delta .track i.plus { background: #dbe4ff; border-left: 0; border-right: 2px solid var(--accent); }
+  .bridge .v { font: 600 28px/1 var(--mono); text-align: right; letter-spacing: -.02em; display: block; }
+  .bridge .delta .v { font-size: 21px; color: var(--muted); }
+  .bridge .total .v { font-size: 32px; }
+  .bridge .team { font: 600 13px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); flex-basis: 100%; }
+
+  /* Checks */
+  .checks { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; }
+  .checklist { border-top: 3px solid var(--ink); }
+  .checklist div { display: grid; grid-template-columns: 1fr 260px; align-items: baseline; gap: 24px; padding: 22px 0; border-bottom: 1px solid var(--rule); font-size: 28px; line-height: 1.15; }
+  .checklist div span:last-child { font: 600 26px/1 var(--mono); text-align: right; }
+  .checklist .ok span:last-child { color: var(--accent); }
+  .checklist .hd { font: 600 15px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--ink); padding: 18px 0 16px; display: block; }
+
+  /* Conclusion */
+  .concl { display: grid; grid-template-columns: 1.1fr 1fr; gap: 72px; align-items: start; }
+  .bignum { border-top: 3px solid var(--accent); padding-top: 26px; }
+  .bignum .k { font: 600 15px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .bignum .v { display: block; margin-top: 22px; font: 600 108px/1 var(--mono); letter-spacing: -.05em; }
+  .bignum .d { display: block; margin-top: 22px; font-size: 28px; line-height: 1.3; color: var(--muted); }
+  .limits { border-top: 3px solid var(--ink); padding-top: 26px; }
+  .limits .k { font: 600 15px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .limits p { margin-top: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--rule); font-size: 27px; line-height: 1.25; }
+
+  .nav { position: fixed; right: 24px; bottom: 16px; z-index: 5; display: flex; gap: 16px; }
+  .nav button { border: 0; background: transparent; color: #374151; font: 600 14px/1 var(--mono); cursor: pointer; padding: 6px 0; border-bottom: 1px solid transparent; }
+  .nav button:hover { border-bottom-color: #374151; }
+
+  @media print {
+    @page { size: 1920px 1080px; margin: 0; }
+    html, body { overflow: visible; background: #fff; }
+    .stage { position: static; transform: none; box-shadow: none; width: 1920px; height: auto; }
+    .slide { position: relative; display: grid !important; width: 1920px; height: 1080px; break-after: page; }
+    .nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Numbers. Regenerated from data/workshop/generated_d2c/keys_d2c.json; never edit by hand. -->
+<script type="application/json" id="keys">
+{
+  "month": "August 2026",
+  "order_entry_all": 32727647,
+  "test_orders_value": 30820,
+  "test_orders_n": 21,
+  "cancelled_value": 1192997,
+  "cancelled_n": 558,
+  "gst_on_placed": 3340413,
+  "net_sales_placed": 28163417,
+  "rto_value": 4293541,
+  "rto_n": 2225,
+  "delivered_sep_value": 4060140,
+  "delivered_sep_n": 2087,
+  "in_transit_value": 465763,
+  "in_transit_n": 240,
+  "july_delivered_aug_value": 3425448,
+  "july_delivered_aug_n": 1734,
+  "delivered_aug": 22769421,
+  "delivered_aug_n": 11713,
+  "returns_received_value": 1319238,
+  "returns_received_n": 902,
+  "exchanges_value": 343132,
+  "exchanges_n": 254,
+  "net_revenue": 21450183,
+  "books": 20995506,
+  "cod_unremitted_value": 2581231,
+  "cod_unremitted_n": 1426,
+  "cod_prior_remitted_value": 2101303,
+  "placed_n": 15110,
+  "delivered_n_placed": 12085,
+  "cancelled_n_placed": 560,
+  "rto_n_placed": 2225,
+  "in_transit_n_placed": 240,
+  "returns_requested_not_received": 0,
+  "example_order": "O0193136",
+  "example_dates": "2026-07-29 | 2026-07-31 | 2026-07-31 | 2026-08-05 | 952 | Jaipur | 2026-08-17 | 2026-08-22 | 2026-09-01 | MRD-W-TEE-004",
+  "example_desc": "₹952 t-shirt sent to Jaipur",
+  "example_capture": "2026-07-30"
+}
+</script>
+
+<main class="stage" id="stage">
+
+  <!-- 1 -->
+  <section class="slide active center">
+    <div class="cover">
+      <div>
+        <h1>How do we get the right data for business decisions?</h1>
+        <div class="cover-meta"><span>Naman Agarwal</span><span>From a business question to a number you can defend</span></div>
+      </div>
+      <div class="block" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="slide">
+    <h2>Every decision sits on a chain.<small>A number is evidence only when we know what it counts.</small></h2>
+    <div class="body">
+      <div class="chain">
+        <div class="step"><span class="n">01</span><span class="t">Question</span><span class="d">What do we need to know?</span></div>
+        <div class="step hi"><span class="n">02</span><span class="t">Evidence</span><span class="d">The number, plus what it represents</span></div>
+        <div class="step"><span class="n">03</span><span class="t">Conclusion</span><span class="d">What the evidence supports</span></div>
+        <div class="step"><span class="n">04</span><span class="t">Decision</span><span class="d">What we choose</span></div>
+        <div class="step"><span class="n">05</span><span class="t">Action</span><span class="d">What we do</span></div>
+      </div>
+    </div>
+    <span class="pg"></span>
+  </section>
+
+  <!-- 3 -->
+  <section class="slide center">
+    <div class="q"><h2>What was our revenue in August?</h2><p class="from">Message from the CEO · asked to four teams</p></div>
+    <span class="pg"></span>
+  </section>
+
+  <!-- 4 -->
+  <section class="slide">
+    <h2>Four teams. Four numbers.<small>Same company, same month, same question. Highest to lowest is a factor of two.</small></h2>
+    <div class="body">
+      <div class="bars">
+        <span class="lbl">E-commerce<small>Store dashboards</small></span><div class="bar" data-bar="order_entry_all"></div><span class="val" data-inr="order_entry_all"></span>
+        <span class="lbl">Growth<small>Marketing report</small></span><div class="bar" data-bar="net_sales_placed"></div><span class="val" data-inr="net_sales_placed"></span>
+        <span class="lbl">Operations<small>Fulfilment report</small></span><div class="bar" data-bar="delivered_aug"></div><span class="val" data-inr="delivered_aug"></span>
+        <span class="lbl">Finance<small>Books of account</small></span><div class="bar lo" data-bar="books"></div><span class="val" data-inr="books"></span>
+      </div>
+    </div>
+    <span class="pg"></span>
+  </section>
+
+  <!-- 5 -->
+  <section class="slide">
+    <h2>Nobody made a mistake. Each team counted a different moment in the same journey.</h2>
+    <div class="body">
+      <div class="stmts">
+        <div><span class="n">01</span><p>Same orders, same customers, same month.</p></div>
+        <div><span class="n">02</span><p>Each answer can be correct for the decision it serves.</p></div>
+        <div class="hi"><span class="n">03</span><p>The answers are not interchangeable.</p></div>
+      </div>
+    </div>
+    <span class="pg"></span>
+  </section>
+
+  <!-- 6 -->
+  <section class="slide">
+    <h2>One real order shows up in three months.<small>Order <span class="mono" data-text="example_order"></span>, a <span data-text="example_desc"></span>. Which month it belongs to depends on which event you count.</small></h2>
+    <div class="body">
+      <div class="months" id="months"></div>
+      <p class="legend"><span class="accent">Blue</span> = money moving back to the customer</p>
+    </div>
+    <span class="pg"></span>
+  </section>
+
+  <!-- 7  Worked example: step 1 -->
+  <section class="slide">
+    <h2>Step 1. Ask what the number is for.<small>We asked the CEO one question before touching any data.</small></h2>
+    <div class="body">
+      <div class="pairs">
+        <div class="hd"><span>We asked</span><span>The CEO said</span></div>
+        <div class="row"><span>What will you use this number for?</span><span>The monthly business review. How much did we sell in August that we get to keep?</span></div>
+        <div class="row"><span>So that means…</span><span>Goods that reached customers. Not orders that were cancelled or came back. Not the tax we collect for the government.</span></div>
+        <div class="row"><span>What about orders still on the way?</span><span>Tell me how many. Don't count them yet.</span></div>
+      </div>
+    </div>
+    <span class="stepmark">Worked example · Revenue</span>
+    <span class="pg"></span>
+  </section>
+
+  <!-- 8  Step 2 journey + states -->
+  <section class="slide">
+    <h2>Step 2. Draw the journey and its end states.<small>Every August order is in exactly one state on Aug 31. The states are where the money forks.</small></h2>
+    <div class="body">
+      <div class="flow">
+        <div class="node"><time>DAY 0</time><b>Placed</b></div>
+        <div class="node"><time>DAY 0–1</time><b>Paid or COD confirmed</b></div>
+        <div class="node"><time>DAY 1–2</time><b>Packed</b></div>
+        <div class="node"><time>DAY 1–3</time><b>Shipped</b></div>
+        <div class="node"><time>DAY 3–8</time><b>Delivered</b></div>
+        <div class="node back"><time>DAY 5–15</time><b>Return requested</b></div>
+        <div class="node back"><time>+3–7</time><b>Return received</b></div>
+        <div class="node back"><time>+4–10</time><b>Refunded</b></div>
+      </div>
+      <div class="states">
+        <div class="state"><span class="k">Placed in August</span><span class="v" data-num="placed_n"></span><span class="d">orders, all channels</span></div>
+        <div class="state"><span class="k">Cancelled before ship</span><span class="v" data-num="cancelled_n_placed"></span><span class="d">customer changed mind, payment failed</span></div>
+        <div class="state"><span class="k">Returned to origin</span><span class="v" data-num="rto_n_placed"></span><span class="d">courier could not deliver; mostly COD</span></div>
+        <div class="state"><span class="k">Still in transit</span><span class="v" data-num="in_transit_n_placed"></span><span class="d">outcome unknown on Aug 31</span></div>
+        <div class="state acc"><span class="k">Delivered</span><span class="v" data-num="delivered_n_placed"></span><span class="d">some later returned or exchanged</span></div>
+      </div>
+    </div>
+    <span class="stepmark">Worked example · Revenue</span>
+    <span class="pg"></span>
+  </section>
+
+  <!-- 9  Step 3 forks -->
+  <section class="slide">
+    <h2>Step 3. Find the forks.<small>Seven places where a reasonable person could choose differently. Bold is what we chose.</small></h2>
+    <div class="body">
+      <div class="forks">
+        <div class="fork"><span class="n">01</span><span class="k">Which orders count?</span><div class="opts"><span class="opt">Everything in the system</span><span class="opt on">Exclude staff test orders</span><span class="opt on">Exclude cancelled orders</span><span class="opt">Webstore only</span></div></div>
+        <div class="fork"><span class="n">02</span><span class="k">Which event counts?</span><div class="opts"><span class="opt">Order placed</span><span class="opt">Shipped</span><span class="opt on">Delivered</span><span class="opt">Cash received</span></div></div>
+        <div class="fork"><span class="n">03</span><span class="k">Which date puts it in August?</span><div class="opts"><span class="opt">Order date</span><span class="opt on">Delivery date</span><span class="opt">Invoice date</span><span class="opt">Payout date</span></div></div>
+        <div class="fork"><span class="n">04</span><span class="k">GST in or out?</span><div class="opts"><span class="opt">Price the customer saw</span><span class="opt on">Excluding GST</span></div></div>
+        <div class="fork"><span class="n">05</span><span class="k">Returns: when and which?</span><div class="opts"><span class="opt">When requested</span><span class="opt on">When received back</span><span class="opt">When refunded</span><span class="opt on">Exchanges not deducted</span></div></div>
+        <div class="fork"><span class="n">06</span><span class="k">Undelivered (RTO)?</span><div class="opts"><span class="opt on">Never counted</span><span class="opt">Counted then reversed</span></div></div>
+        <div class="fork"><span class="n">07</span><span class="k">Marketplaces and COD?</span><div class="opts"><span class="opt on">At selling price</span><span class="opt">At net payout</span><span class="opt">When cash arrives</span></div></div>
+      </div>
+    </div>
+    <span class="stepmark">Worked example · Revenue</span>
+    <span class="pg"></span>
+  </section>
+
+  <!-- 10  Step 4 bridge -->
+  <section class="slide" style="row-gap:36px">
+    <h2 style="max-width:none">Step 4. Why the four numbers differ. <span style="font-weight:400;color:var(--muted)">Same road, different stops.</span></h2>
+    <div class="body">
+      <div class="bridge" id="bridge"></div>
+    </div>
+    <span class="stepmark">Worked example · Revenue</span>
+    <span class="pg"></span>
+  </section>
+
+  <!-- 11  Step 5 definition -->
+  <section class="slide">
+    <h2>Step 5. Write the definition down.<small>Seven lines. Anyone can recompute the number from these.</small></h2>
+    <div class="body">
+      <div class="defs">
+        <div class="def"><span class="n">01</span><span class="k">Why</span><span class="v">Monthly business review: what we sold and keep</span></div>
+        <div class="def"><span class="n">02</span><span class="k">Who / what</span><span class="v">Real customer orders, all channels<small>Test orders and cancellations excluded</small></span></div>
+        <div class="def"><span class="n">03</span><span class="k">What happened</span><span class="v">Delivered to the customer</span></div>
+        <div class="def"><span class="n">04</span><span class="k">When</span><span class="v">Delivery date in August</span></div>
+        <div class="def"><span class="n">05</span><span class="k">Rules</span><span class="v">Excluding GST. Minus returns received in August. Exchanges kept.<small>Marketplace orders at selling price; fees are a cost, not less revenue</small></span></div>
+        <div class="def"><span class="n">06</span><span class="k">Check</span><span class="v">Reconcile to the books; count what is still open</span></div>
+        <div class="def"><span class="n">07</span><span class="k">Claim</span><span class="v">Sales we delivered and kept in August. Not cash. Not profit.</span></div>
+      </div>
+    </div>
+    <span class="stepmark">Worked example · Revenue</span>
+    <span class="pg"></span>
+  </section>
+
+  <!-- 12  Step 6 validation -->
+  <section class="slide">
+    <h2>Step 6. Check it.<small>A number you have not reconciled is a guess with decimals.</small></h2>
+    <div class="body checks">
+      <div class="checklist">
+        <span class="hd">Reconcile to Finance</span>
+        <div><span>Our number</span><span data-inr="net_revenue"></span></div>
+        <div><span>Books of account</span><span data-inr="books"></span></div>
+        <div><span>COD delivered in August, cash not yet received from courier</span><span data-inr-neg="cod_unremitted_value"></span></div>
+        <div><span>COD from July orders, cash received in August</span><span data-inr-plus="cod_prior_remitted_value"></span></div>
+        <div><span>Undelivered orders the books also deduct</span><span data-inr-neg="rto_value"></span></div>
+        <div class="ok"><span>Explained</span><span>Timing, not sales</span></div>
+      </div>
+      <div class="checklist">
+        <span class="hd">Sanity checks</span>
+        <div class="ok"><span>Test orders found and removed</span><span data-num="test_orders_n"></span></div>
+        <div class="ok"><span>Duplicate order IDs</span><span>0</span></div>
+        <div class="ok"><span>Returns requested but not yet received</span><span data-num="returns_requested_not_received"></span></div>
+        <div class="ok"><span>Orders still in transit (excluded, reported)</span><span data-num="in_transit_n"></span></div>
+        <div class="ok"><span>July orders delivered in August (included)</span><span data-num="july_delivered_aug_n"></span></div>
+        <div class="ok"><span>Marketplace returns still arriving (T+21–35)</span><span>Provisional</span></div>
+      </div>
+    </div>
+    <span class="stepmark">Worked example · Revenue</span>
+    <span class="pg"></span>
+  </section>
+
+  <!-- 13  Step 7 conclusion -->
+  <section class="slide">
+    <h2>Step 7. State the conclusion and its limits.</h2>
+    <div class="body concl">
+      <div class="bignum">
+        <span class="k">August net revenue · excluding GST</span>
+        <span class="v" data-inr="net_revenue"></span>
+        <span class="d">Goods delivered in August, less returns received in August. Supports: "we delivered and kept ₹2.2 Cr of sales in August." Down from the ₹3.3 Cr on the store dashboard by cancellations, undelivered COD, GST, and timing.</span>
+      </div>
+      <div class="limits">
+        <span class="k">What this number does not prove</span>
+        <p>Not cash: <span data-lakh="cod_unremitted_value"></span> of COD is still with couriers.</p>
+        <p>Not final: <span data-num="in_transit_n"></span> orders in transit; marketplace returns arrive for another month.</p>
+        <p>Not profit: fees, shipping, returns cost and ads are not in it.</p>
+        <p>Not demand: cancellations and RTO are excluded, so it understates what customers wanted.</p>
+      </div>
+    </div>
+    <span class="stepmark">Worked example · Revenue</span>
+    <span class="pg"></span>
+  </section>
+
+  <!-- 14 -->
+  <section class="slide">
+    <h2>The decision picks the event.<small>The same journey supports six different, correct numbers.</small></h2>
+    <div class="body">
+      <div class="pairs arrow">
+        <div class="hd"><span>If you want to…</span><span>…count the moment when</span></div>
+        <div class="row"><span>Measure customer demand</span><span>Order is placed</span></div>
+        <div class="row"><span>Measure fulfilment performance</span><span>Order is delivered</span></div>
+        <div class="row"><span>Prepare management accounts</span><span>Revenue is recognised</span></div>
+        <div class="row"><span>Plan cash availability</span><span>Payment or settlement is received</span></div>
+        <div class="row"><span>Measure return activity</span><span>Return is received</span></div>
+        <div class="row"><span>Measure cash refunded</span><span>Refund is processed</span></div>
+      </div>
+    </div>
+    <span class="pg"></span>
+  </section>
+
+  <!-- 15 -->
+  <section class="slide">
+    <h2>Two valid views of August. Both right, different questions.</h2>
+    <div class="body">
+      <div class="views">
+        <div class="view">
+          <h3>August activity</h3>
+          <p>Everything that happened in August, whenever the order was placed.</p>
+          <div class="strip">
+            <span class="m">JUL</span><span class="m on">AUG</span><span class="m">SEP</span>
+            <div class="win" aria-hidden="true"></div>
+            <div class="lanes">
+              <div class="lane"><i style="left:10%;width:40%"></i><i style="left:33.33%;width:16.67%" class="on"></i></div>
+              <div class="lane"><i style="left:38%;width:26%"></i><i style="left:38%;width:26%" class="on"></i></div>
+              <div class="lane"><i style="left:50%;width:42%"></i><i style="left:50%;width:16.66%" class="on"></i></div>
+            </div>
+          </div>
+          <p class="cap">Counts the part of each order that falls inside the window. Our revenue number is this view.</p>
+        </div>
+        <div class="view">
+          <h3>August cohort</h3>
+          <p>Orders placed in August, followed wherever they go, even into September.</p>
+          <div class="strip">
+            <span class="m">JUL</span><span class="m on">AUG</span><span class="m">SEP</span>
+            <div class="win" aria-hidden="true"></div>
+            <div class="lanes">
+              <div class="lane"><i style="left:10%;width:40%"></i></div>
+              <div class="lane"><i style="left:38%;width:26%" class="acc"></i></div>
+              <div class="lane"><i style="left:50%;width:42%" class="acc"></i></div>
+            </div>
+          </div>
+          <p class="cap">Counts whole orders that started in the window. Return rates and repeat rates need this view.</p>
+        </div>
+      </div>
+    </div>
+    <span class="pg"></span>
+  </section>
+
+  <!-- 16 -->
+  <section class="slide">
+    <h2>The business defines the meaning. Analytics and AI compute it.</h2>
+    <div class="body">
+      <div class="pairs">
+        <div class="hd"><span class="accent">Business decides</span><span>Analytics and AI handle</span></div>
+        <div class="row"><span>The decision being made</span><span>Systems holding the data</span></div>
+        <div class="row"><span>Who and what is measured</span><span>Tables and fields</span></div>
+        <div class="row"><span>The event that counts</span><span>Table grain and relationships</span></div>
+        <div class="row"><span>The date that applies</span><span>Joins and filters</span></div>
+        <div class="row"><span>Rules and exceptions</span><span>Missing and duplicate records</span></div>
+        <div class="row"><span>The conclusion we may draw</span><span>Query and calculation</span></div>
+      </div>
+    </div>
+    <span class="pg"></span>
+  </section>
+
+  <!-- 17 -->
+  <section class="slide">
+    <h2>The path to the right data.<small>Most wrong numbers go wrong in Stage 1, before any data is touched.</small></h2>
+    <div class="body">
+      <div class="path">
+        <div class="band acc"><span class="bt">Stage 1 · Business</span>
+          <div class="steps">
+            <div><span class="n">01</span><b>Business decision</b></div>
+            <div><span class="n">02</span><b>Business journey</b></div>
+            <div><span class="n">03</span><b>Definition of what counts</b></div>
+          </div>
+        </div>
+        <div class="band"><span class="bt">Stage 2 · Data</span>
+          <div class="steps">
+            <div><span class="n">04</span><b>Required events and data</b></div>
+            <div><span class="n">05</span><b>Technical calculation</b></div>
+            <div><span class="n">06</span><b>Validation</b></div>
+          </div>
+        </div>
+        <div class="band"><span class="bt">Stage 3 · Outcome</span>
+          <div class="steps">
+            <div><span class="n">07</span><b>Evidence</b></div>
+            <div><span class="n">08</span><b>Conclusion</b></div>
+            <div><span class="n">09</span><b>Decision and action</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <span class="pg"></span>
+  </section>
+
+  <!-- 18 -->
+  <section class="slide">
+    <h2>If the business meaning is missing, <span class="accent">the AI will pick one for you.</span></h2>
+    <div class="body">
+      <div class="pairs">
+        <div class="hd"><span>AI can</span><span class="accent">The business must</span></div>
+        <div class="row"><span>Find relevant tables</span><span>State the decision</span></div>
+        <div class="row"><span>Interpret schemas</span><span>Define what the metric means</span></div>
+        <div class="row"><span>Join data</span><span>Choose the event and the date</span></div>
+        <div class="row"><span>Write SQL</span><span>Decide rules and exceptions</span></div>
+        <div class="row"><span>Calculate results</span><span>Validate the assumptions</span></div>
+        <div class="row"><span>Show alternative calculations</span><span>Own the conclusion</span></div>
+      </div>
+    </div>
+    <span class="pg"></span>
+  </section>
+
+  <!-- 19 -->
+  <section class="slide">
+    <h2>Right data has three parts. All three are required.</h2>
+    <div class="body">
+      <div class="eq">
+        <div class="term"><b>Right meaning</b><p>The decision, the event, the date, the rules.</p><div class="fail">Clean data answers the wrong question.</div></div>
+        <div class="op">+</div>
+        <div class="term"><b>Right calculation</b><p>The tables, joins, filters and formula.</p><div class="fail">Correct SQL computes the wrong definition.</div></div>
+        <div class="op">+</div>
+        <div class="term"><b>Right validation</b><p>Reconciliation, checks, known gaps.</p><div class="fail">A correct number supports the wrong conclusion.</div></div>
+      </div>
+    </div>
+    <span class="pg"></span>
+  </section>
+
+  <!-- 20 -->
+  <section class="slide">
+    <h2>The exercise. Each team receives three things.<small>Nothing else. No documents, no definitions, no hints. Everything you need is in the data.</small></h2>
+    <div class="body">
+      <div class="tiles">
+        <div class="tile"><span class="n">01</span><b>One message from the CEO<small>One line. Names a metric, not a definition. Same style as "What was our revenue in August?"</small></b></div>
+        <div class="tile"><span class="n">02</span><b>The company's data<small>One download. Same file for every team. A README explains every table in plain language.</small></b></div>
+        <div class="tile acc"><span class="n">03</span><b>An AI analyst<small>ChatGPT. Upload the file, ask questions in plain English. It computes; you decide what counts.</small></b></div>
+      </div>
+    </div>
+    <span class="pg"></span>
+  </section>
+
+  <!-- 21 -->
+  <section class="slide">
+    <h2>Your work. The same seven steps we just did for revenue.<small>Steps 1–4 happen before anyone touches data.</small></h2>
+    <div class="body">
+      <div class="num2">
+        <div><span class="n">01</span><b>Decide what the CEO will use the number for</b></div>
+        <div><span class="n">05</span><b>Ask the AI to calculate your definition</b></div>
+        <div><span class="n">02</span><b>Draw the journey and its end states</b></div>
+        <div><span class="n">06</span><b>Check it against a second source</b></div>
+        <div><span class="n">03</span><b>Find the forks in that journey</b></div>
+        <div><span class="n">07</span><b>State the conclusion and its limits</b></div>
+        <div><span class="n">04</span><b>Write the definition in seven lines</b></div>
+        <div></div>
+      </div>
+    </div>
+    <span class="pg"></span>
+  </section>
+
+  <!-- 22 -->
+  <section class="slide">
+    <h2>Report back. Eight items, three minutes per team.<small>Item 08 is the one most teams skip.</small></h2>
+    <div class="body">
+      <div class="num2">
+        <div><span class="n">01</span><b>The CEO's message</b></div>
+        <div><span class="n">05</span><b>The number and how it was calculated</b></div>
+        <div><span class="n">02</span><b>The decision it serves</b></div>
+        <div><span class="n">06</span><b>What you checked it against</b></div>
+        <div><span class="n">03</span><b>The forks you found</b></div>
+        <div><span class="n">07</span><b>The conclusion</b></div>
+        <div><span class="n">04</span><b>The definition you chose, and why</b></div>
+        <div><span class="n">08</span><b>What the evidence does not prove</b></div>
+      </div>
+    </div>
+    <span class="pg"></span>
+  </section>
+
+</main>
+
+<nav class="nav" aria-label="Navigation">
+  <button type="button" data-prev>← PREV</button>
+  <button type="button" data-next>NEXT →</button>
+</nav>
+
+<script>
+  const K = JSON.parse(document.getElementById('keys').textContent);
+
+  // Slide 6: one order across three months, from the example key
+  (function () {
+    const d = K.example_dates.split(' | ').map(s => s.trim());
+    const [order, packed, shipped, delivered, , , req, recv, refund] = d;
+    const evs = [[order, 'Order placed'], [K.example_capture, 'Payment captured'], [packed, 'Packed'], [shipped, 'Shipped'],
+                 [delivered, 'Delivered'], [req, 'Return requested', 1], [recv, 'Return received', 1], [refund, 'Refund processed', 1]]
+      .filter(e => e[0] && e[0] !== 'None');
+    const MON = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+    const byM = {};
+    evs.forEach(e => { const m = +e[0].slice(5, 7); (byM[m] = byM[m] || []).push(e); });
+    const months = Object.keys(byM).map(Number).sort((a, b) => a - b);
+    const el = document.getElementById('months');
+    if (!el) return;
+    el.style.gridTemplateColumns = months.map(m => m === 8 ? '2fr' : '1.1fr').join(' ');
+    el.innerHTML = months.map(m => `<div class="month ${m === 8 ? 'aug' : ''}"><span class="mn">${MON[m - 1]}</span><span class="cnt">${byM[m].length} event${byM[m].length > 1 ? 's' : ''}</span>
+      <div class="evs">${byM[m].map(e => `<div class="ev ${e[2] ? 'back' : ''}"><time>${e[0].slice(8, 10)} ${MON[m - 1].slice(0, 3)}</time><b>${e[1]}</b></div>`).join('')}</div></div>`).join('');
+  })();
+  const inr = n => '₹' + Math.round(Math.abs(n)).toLocaleString('en-IN');
+  const num = n => Math.round(n).toLocaleString('en-IN');
+  const lakh = n => '₹' + (Math.round(n / 1e4) / 10).toFixed(n >= 1e6 ? 0 : 1) + ' L';
+  document.querySelectorAll('[data-lakh]').forEach(el => el.textContent = lakh(K[el.dataset.lakh]));
+  document.querySelectorAll('[data-inr]').forEach(el => el.textContent = inr(K[el.dataset.inr]));
+  document.querySelectorAll('[data-inr-neg]').forEach(el => el.textContent = '− ' + inr(K[el.dataset.inrNeg]));
+  document.querySelectorAll('[data-inr-plus]').forEach(el => el.textContent = '+ ' + inr(K[el.dataset.inrPlus]));
+  document.querySelectorAll('[data-num]').forEach(el => el.textContent = num(K[el.dataset.num]));
+  document.querySelectorAll('[data-text]').forEach(el => el.textContent = K[el.dataset.text]);
+  const barMax = Math.max(...[...document.querySelectorAll('[data-bar]')].map(el => K[el.dataset.bar]));
+  document.querySelectorAll('[data-bar]').forEach(el => el.style.width = (100 * K[el.dataset.bar] / barMax) + '%');
+
+  // Bridge: totals and deltas, drawn as a waterfall
+  const bridge = [
+    { t: 'total', team: 'E-commerce', l: 'Every order placed in August', s: 'Price the customer saw, incl. GST, incl. cancelled and test orders', k: 'order_entry_all' },
+    { t: 'delta', l: 'Test orders by staff', s: `${K.test_orders_n} orders`, k: 'test_orders_value', sign: -1 },
+    { t: 'delta', l: 'Cancelled before shipping', s: `${num(K.cancelled_n)} orders`, k: 'cancelled_value', sign: -1 },
+    { t: 'delta', l: 'GST collected for the government', s: '5% / 12% / 18% by product', k: 'gst_on_placed', sign: -1 },
+    { t: 'total', team: 'Growth', l: 'Net sales placed in August', s: 'Excl. GST, excl. cancelled and test', k: 'net_sales_placed' },
+    { t: 'delta', l: 'Returned to origin, never delivered', s: `${num(K.rto_n)} orders, mostly COD`, k: 'rto_value', sign: -1 },
+    { t: 'delta', l: 'Delivered in September or still in transit', s: `${num(K.delivered_sep_n + K.in_transit_n)} orders`, k: ['delivered_sep_value', 'in_transit_value'], sign: -1 },
+    { t: 'delta', l: 'July orders delivered in August', s: `${num(K.july_delivered_aug_n)} orders`, k: 'july_delivered_aug_value', sign: +1 },
+    { t: 'total', team: 'Operations', l: 'Delivered in August', s: 'Excl. GST, by delivery date', k: 'delivered_aug' },
+    { t: 'delta', l: 'Returns received back in August', s: `${num(K.returns_received_n)} items; exchanges not deducted`, k: 'returns_received_value', sign: -1 },
+    { t: 'total', team: 'Our definition', acc: true, l: 'Net revenue, August', s: 'Delivered, excl. GST, less returns received', k: 'net_revenue' },
+    { t: 'delta', l: 'COD cash timing and books\u2019 own deductions', s: 'Reconciled in Step 6', k: ['books', 'net_revenue'], signs: [+1, -1] },
+    { t: 'total', team: 'Finance', l: 'Books of account', s: 'Recognised on delivery; COD when cash arrives', k: 'books' },
+  ];
+  const val = r => Array.isArray(r.k) ? (r.sign || 1) * r.k.reduce((a, k, i) => a + (r.signs ? r.signs[i] : 1) * K[k], 0) : K[r.k] * (r.sign || 1);
+  const maxV = K.order_entry_all;
+  let run = 0, html = '';
+  bridge.forEach(r => {
+    const v = val(r);
+    if (r.t === 'total') {
+      run = v;
+      html += `<div class="l total ${r.acc ? 'acc' : ''}"><span class="team">${r.team}</span><b>${r.l}</b><small>${r.s}</small></div>
+               <div class="total ${r.acc ? 'acc' : ''}"><div class="track"><i style="left:0;width:${100 * v / maxV}%"></i></div></div>
+               <div class="total ${r.acc ? 'acc' : ''}"><span class="v">${inr(v)}</span></div>`;
+    } else {
+      const from = run, to = run + v; run = to;
+      const left = Math.min(from, to), width = Math.abs(v);
+      html += `<div class="l delta">${r.l}<small>${r.s}</small></div>
+               <div class="delta"><div class="track"><i class="${v > 0 ? 'plus' : ''}" style="left:${100 * left / maxV}%;width:${Math.max(100 * width / maxV, 0.3)}%"></i></div></div>
+               <div class="delta"><span class="v">${v > 0 ? '+ ' : '− '}${inr(v)}</span></div>`;
+    }
+  });
+  document.getElementById('bridge').innerHTML = html;
+
+  // Deck mechanics
+  const stage = document.getElementById('stage');
+  const slides = [...document.querySelectorAll('.slide')];
+  slides.forEach((s, i) => { const p = s.querySelector('.pg'); if (p) p.textContent = String(i + 1).padStart(2, '0') + ' / ' + slides.length; });
+  const startAt = parseInt(new URLSearchParams(location.search).get('s'), 10) || parseInt(location.hash.slice(1), 10) || 1;
+  let index = Math.max(0, Math.min(slides.length - 1, startAt - 1));
+  function fit() { stage.style.setProperty('--s', Math.min(innerWidth / 1920, innerHeight / 1080)); }
+  function show(i) {
+    index = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((el, k) => el.classList.toggle('active', k === index));
+    history.replaceState(null, '', '#' + (index + 1));
+  }
+  addEventListener('resize', fit); fit(); show(index);
+  document.querySelector('[data-prev]').addEventListener('click', () => show(index - 1));
+  document.querySelector('[data-next]').addEventListener('click', () => show(index + 1));
+  addEventListener('keydown', e => {
+    if (new URLSearchParams(location.search).has('static')) return;
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); show(index + 1); }
+    if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); show(index - 1); }
+    if (e.key === 'Home') show(0);
+    if (e.key === 'End') show(slides.length - 1);
+    if (e.key === 'f') document.documentElement.requestFullscreen?.();
+  });
+</script>
+</body>
+</html>
