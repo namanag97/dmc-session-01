@@ -54,6 +54,18 @@
   .msg .bubble p { font-size: 26px; line-height: 1.4; letter-spacing: -.01em; }
   .msg .bubble p + p { margin-top: 20px; }
   .msg .bubble p.ask { font-weight: 700; }
+  .reply { max-width: 1500px; }
+  .reply .from { display: flex; gap: 18px; align-items: center; margin-bottom: 16px; }
+  .reply .av { width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font: 600 16px/1 var(--mono); }
+  .reply .from div span { display: block; font-size: 19px; color: var(--muted); }
+  .reply .from div b { font-size: 22px; }
+  .reply .bubble { background: var(--tint); border-radius: 26px 26px 6px 26px; padding: 30px 44px 18px; }
+  .reply .ans { font-size: 31px; line-height: 1.28; font-weight: 700; letter-spacing: -.02em; margin: 0 0 16px; }
+  .reply .part { border-top: 1px solid var(--rule); padding: 12px 0 2px; display: grid; grid-template-columns: 280px 1fr; column-gap: 32px; }
+  .reply .part .k { font: 600 14px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding-top: 4px; }
+  .reply .part p { font-size: 21px; line-height: 1.32; margin: 0 0 8px; }
+  .reply .part.do .k { color: var(--accent); }
+  .reply .part.do p { font-weight: 700; }
   .decision { border-top: 3px solid var(--accent); padding-top: 26px; }
   .decision .k { font: 600 15px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
   .decision p { margin-top: 20px; font-size: 34px; line-height: 1.22; letter-spacing: -.02em; font-weight: 700; }
@@ -1060,6 +1072,61 @@
     },
   ];
 
+
+  // ── Reply to the CEO, one per pack. Plain words. Answer first.
+  const REPLIES = {
+    1: { answer: `A new paid customer cost us ${inr(K.j1_paid_cac)} in August. In July it was ${inr(K.j1_jul_paid_cac)}.`,
+         counted: [`All Meta and Google spend for August, using each day's final figure (five days were reported twice).`,
+                   `People, not accounts: one person with two logins is one customer.`,
+                   `Only people whose first ever order came from an ad, and who placed it in August.`],
+         not: [`Marketplace buyers are left out; we paid Amazon a commission, not an ad. Add them in and the cost looks like ${inr(K.j1_blended_cac)}, but that is not what more ad money buys.`,
+               `One in five of these first orders never reached the customer. Count only the ones that did and the cost is ${inr(K.j1_paid_cac_delivered)}.`],
+         do: `Do not raise the budget yet. The cost per customer rose a third in one month. Fix the undelivered first orders first; that is the cheaper lever.` },
+    2: { answer: `Worse. ${pct(K.j2_cvr_eligible, 2)} of real visits became an order in August, against ${pct(K.j2_jul_cvr_eligible, 2)} in July.`,
+         counted: [`Visits by people: bots and our own staff removed (they were a fifth of August's raw traffic).`,
+                   `A conversion is a visit that placed an order, in the same month as the visit.`,
+                   `Same comparison on paid visits alone: also down. So it is not just a change in who came.`],
+         not: [`Fewer people who started checkout finished it (${pct(K.j2_jul_checkout_completion)} to ${pct(K.j2_checkout_completion)}). We do not know why from this data; it points at checkout, not at the shop.`],
+         do: `Before spending on a redesign, look at what changed at checkout in August. That is where the fall is.` },
+    3: { answer: `${pct(K.j3_edd_hit_placed, 0)} of August orders that reached the customer arrived by the date we promised. July was ${pct(K.j3_edd_hit_placed_jul, 0)}.`,
+         counted: [`Orders placed in August and delivered. Cancelled and refused parcels are not "late", they are a different problem.`,
+                   `On time means delivered on or before the date the customer saw at checkout.`,
+                   `The nine in ten on the operations dashboard is the parcel leaving our warehouse within three days, not arriving.`],
+         not: [`The miss is not spread evenly. Howrah moved to courier SFX on 10 August; that lane runs at ${pct(K.j3_edd_hit_sfx, 0)}. The other couriers are close to July.`],
+         do: `Take the SFX lane to the negotiation, not the whole network. Or move Howrah back.` },
+    4: { answer: `Returns cost us ${L(K.j4_out_of_pocket)} in cash in August, on top of ${L(K.j4_refunds_total_req)} we handed back.`,
+         counted: [`Cash we will not see again: courier fees both ways, marketplace penalties, payment fees we could not recover, stock that came back damaged.`,
+                   `Everything requested in August: customer returns, marketplace returns, and parcels refused at the door.`,
+                   `Refunds are not in the cost. The goods came back and are on the shelf.`],
+         not: [`Two thirds of the cash went on cash-on-delivery parcels refused at the door. A tighter return policy does not reach those; it would save ${L(K.j4_revfee_total_req)} a month at most.`],
+         do: `Leave the return window. Work on refused COD parcels: confirm the order before shipping, or ask for a small advance.` },
+    5: { answer: `Half. ${pct(K.j5_repeat_rev_share, 0)} of August's delivered sales came from people who had bought from us before. July was ${pct(K.j5_jul_repeat_rev_share, 0)}.`,
+         counted: [`Sales delivered in August, without GST.`,
+                   `People, not accounts: we matched on phone and email. By account alone it reads ${pct(K.j5_repeat_rev_share_naive, 0)}, because guest checkouts and marketplace orders create new accounts for old customers.`,
+                   `Repeat means their first order was before 1 August.`],
+         not: [`This is a share of sales, not a count of customers. It says half the money came from known people; it does not say they are loyal, or profitable.`],
+         do: `The repeat programme can point at half the revenue. Fix the duplicate accounts first, or every number about repeat customers will be wrong by a tenth.` },
+    6: { answer: `Yes, a little. ${K.j6_complaints_per_100_aug.toFixed(1)} complaints for every 100 orders delivered in August, against ${K.j6_complaints_per_100_jul.toFixed(1)} in July.`,
+         counted: [`Both helpdesk systems. Tickets copied into the new system in the cutover week were counted once.`,
+                   `A complaint is the first ticket about a delay, a wrong item, a refund or quality. Follow-ups and general questions are not complaints.`,
+                   `Per 100 delivered orders, so growth does not look like unhappiness.`],
+         not: [`The new helpdesk did not cause it; the rise is in delivery delays and wrong items, which are warehouse and courier problems.`,
+               `The satisfaction score cannot settle this: only one ticket in ten got a rating.`],
+         do: `Stop looking at the helpdesk. Look at Howrah and the SFX lane.` },
+    7: { answer: `Gross margin was ${pct(K.j7_gm_after_returns_pct)} in August after returns, ${pct(K.j7_cm1_v2)} before them.`,
+         counted: [`Delivered sales without GST. Test orders out.`,
+                   `Cost of goods at the current cost table. The last board pack used the old table, which is ${pct(K.j7_cm1_v1)}; the goods did not get cheaper, the table was stale.`,
+                   `Returns received in August taken out; the goods that came back saleable added back at cost.`],
+         not: [`This is margin on goods, before shipping, marketing and platform fees. July on the same basis was ${pct(K.j7_jul_cm1_v2)}; the sale cost ${(K.j7_jul_cm1_v2 - K.j7_cm1_v2).toFixed(1)} points, not the fall the old table suggests.`],
+         do: `Restate the board pack on the current cost table. Then judge the sale on ${(K.j7_jul_cm1_v2 - K.j7_cm1_v2).toFixed(1)} points, which is what it actually cost.` },
+    8: { answer: `About ${L(K.j8_hero_lost_revenue_est)} of sales we did not make, over four days at two warehouses. This is an estimate.`,
+         counted: [`Hero products were out of stock at Howrah and Bhiwandi from 21 to 24 August. Gurugram and Hoskote kept selling.`,
+                   `What they would have sold: their own rate from the ten days before, lifted by how much the other two warehouses rose during the sale. Roughly ${num(K.j8_hero_lost_units_est)} units.`],
+         not: [`Nobody can count a sale that did not happen. The ${L(K.j8_hero_lost_revenue_naive)} figure assumes every warehouse ran out; two did not.`,
+               `Product page views barely dipped, so the demand was there. Some of it may have bought something else or come back later; we cannot see that.`],
+         do: `Hold safety stock for hero products in the east and west only, sized for sale weeks. Do not size it off the ${L(K.j8_hero_lost_revenue_naive)} number.` },
+  };
+
   // ── Rendering
   const stage = document.getElementById('stage');
   const add = html => stage.insertAdjacentHTML('beforeend', html);
@@ -1086,12 +1153,12 @@
   </section>`);
 
   addIf(wantIntro, `<section class="slide">
-    <h2>Each pack, seven slides. Same steps as the revenue example.<small>The answer at the end is one defensible number, not the only one. A team that chose differently and said why has done the work.</small></h2>
+    <h2>Each pack, eight slides. Same steps as the revenue example.<small>The answer at the end is one defensible number, not the only one. A team that chose differently and said why has done the work.</small></h2>
     <div class="body"><div class="tiles">
       <div class="tile"><span class="n">01 · 02</span><b>The message, and who believes what<small>The CEO's note, the decision it serves, and the two numbers already in the room, each with the reason its owner trusts it.</small></b></div>
       <div class="tile"><span class="n">03</span><b>The journey as it really happens<small>Not a line: a flow that splits. Each bar is the one above it, cut where the business forks.</small></b></div>
       <div class="tile"><span class="n">04 · 05</span><b>Forks, and the numbers they produce<small>Every fork carries the number you get by taking it. Then the room's numbers, labelled by who brings them.</small></b></div>
-      <div class="tile"><span class="n">06 · 07</span><b>Definition, answer, limits<small>Seven lines anyone can recompute. What to say to the CEO. What the number does not prove.</small></b></div>
+      <div class="tile"><span class="n">06 · 07 · 08</span><b>Definition, answer, reply<small>Seven lines anyone can recompute. The number and its limits. Then the reply to the CEO, in plain words.</small></b></div>
     </div></div>
     <span class="pg"></span>
   </section>`);
@@ -1181,13 +1248,27 @@
       <div class="body"><div class="concl">
         <div>
           <div class="bignum"><span class="k">${C.k}</span><span class="v">${C.v}</span><span class="d">${C.d}</span></div>
-          <div class="tell">${C.tell}</div>
         </div>
         <div class="limits"><span class="k">What this number does not prove</span>
           ${C.limits.map(l => `<p>${l}</p>`).join('')}
         </div>
       </div></div>
       ${step('Steps 6 and 7 · Check, conclude')}<span class="pg"></span></section>`);
+
+    // 8. the reply
+    const R = REPLIES[p.id];
+    add(`<section class="slide">${mark(p)}
+      <h2>The reply.<small>What the table says back. Answer first, in his words, not ours.</small></h2>
+      <div class="body"><div class="reply">
+        <div class="from"><div class="av">T</div><div><b>The table</b><span>to Naman Agarwal, CEO · re: ${p.q}</span></div></div>
+        <div class="bubble">
+          <p class="ans">${R.answer}</p>
+          <div class="part"><span class="k">What we counted</span><div>${R.counted.map(t => `<p>${t}</p>`).join('')}</div></div>
+          <div class="part"><span class="k">What this does not tell you</span><div>${R.not.map(t => `<p>${t}</p>`).join('')}</div></div>
+          <div class="part do"><span class="k">What we would do</span><div><p>${R.do}</p></div></div>
+        </div>
+      </div></div>
+      ${step('Step 8 · Report back')}<span class="pg"></span></section>`);
   });
 
   addIf(wantClose, `<section class="slide">
