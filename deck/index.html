@@ -206,6 +206,11 @@
   .limits .k { font: 600 15px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
   .limits p { margin-top: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--rule); font-size: 27px; line-height: 1.25; }
 
+  .go { display: grid; grid-template-columns: 560px 1fr; column-gap: 96px; align-items: center; }
+  .go img { width: 560px; height: 560px; display: block; }
+  .go .url { font: 600 84px/1 var(--mono); letter-spacing: -.04em; color: var(--accent); margin-bottom: 44px; }
+  .go .steps { margin-top: 0; }
+
   .nav { position: fixed; right: 24px; bottom: 16px; z-index: 5; display: flex; gap: 16px; }
   .nav button { border: 0; background: transparent; color: #374151; font: 600 14px/1 var(--mono); cursor: pointer; padding: 6px 0; border-bottom: 1px solid transparent; }
   .nav button:hover { border-bottom-color: #374151; }
@@ -649,6 +654,24 @@
         <div><span class="n">07</span><b>The conclusion</b></div>
         <div><span class="n">04</span><b>The definition you chose, and why</b></div>
         <div><span class="n">08</span><b>What the evidence does not prove</b></div>
+      </div>
+    </div>
+    <span class="pg"></span>
+  </section>
+
+  <section class="slide">
+    <h2>Start. One laptop per table.<small>The page has your CEO message, the data download and every setup step. You have an hour.</small></h2>
+    <div class="body">
+      <div class="go">
+        <img src="./right-data-assets/qr.svg" alt="QR code for dmc-ses-01.netlify.app">
+        <div>
+          <p class="url">dmc-ses-01.netlify.app</p>
+          <div class="steps">
+            <div><span class="n">01</span><b>Scan, or type the address</b></div>
+            <div><span class="n">02</span><b>Enter your table number</b></div>
+            <div><span class="n">03</span><b>Read the CEO's message. Follow the steps.</b></div>
+          </div>
+        </div>
       </div>
     </div>
     <span class="pg"></span>

@@ -115,8 +115,9 @@
   .bars .val { font: 600 40px/1 var(--mono); text-align: right; letter-spacing: -.02em; }
   .bars .val.hi { color: var(--accent); }
 
+  .defwrap { display: grid; grid-template-columns: 1fr 520px; column-gap: 64px; align-items: start; }
   .defs { border-top: 3px solid var(--ink); }
-  .def { display: grid; grid-template-columns: 60px 260px 1fr; align-items: center; gap: 32px; min-height: 96px; border-bottom: 1px solid var(--rule); }
+  .def { display: grid; grid-template-columns: 56px 220px 1fr; align-items: center; gap: 32px; min-height: 96px; border-bottom: 1px solid var(--rule); }
   .def .n { font: 600 15px/1 var(--mono); color: var(--accent); }
   .def .k { font: 600 20px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
   .def .v { font-size: 31px; font-weight: 700; letter-spacing: -.02em; line-height: 1.08; }
@@ -131,11 +132,11 @@
   .tell::before { content: "Say to the CEO"; display: block; font: 600 13px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #9db4ff; margin-bottom: 10px; }
   .checklist { margin-top: 32px; border-top: 3px solid var(--ink); }
   .checklist .hd { font: 600 15px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--ink); padding: 16px 0 14px; display: block; }
-  .checklist div { display: grid; grid-template-columns: 1fr 300px; align-items: baseline; gap: 24px; padding: 12px 0; border-bottom: 1px solid var(--rule); font-size: 23px; line-height: 1.15; }
+  .checklist div { display: grid; grid-template-columns: 1fr 200px; align-items: baseline; gap: 24px; padding: 12px 0; border-bottom: 1px solid var(--rule); font-size: 23px; line-height: 1.15; }
   .checklist div span:last-child { font: 600 22px/1 var(--mono); text-align: right; color: var(--accent); }
   .limits { border-top: 3px solid var(--ink); padding-top: 26px; }
   .limits .k { font: 600 15px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-  .limits p { margin-top: 14px; padding-bottom: 13px; border-bottom: 1px solid var(--rule); font-size: 23px; line-height: 1.28; }
+  .limits p { margin-top: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--rule); font-size: 26px; line-height: 1.3; }
   .limits p b { color: var(--accent); }
 
   .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
@@ -426,20 +427,20 @@
   "j8_hero_oos_rate": 7.61,
   "j8_phantom_oos_rows": 51,
   "j8_stock_missing_dates": 5,
-  "j8_hero_units_pre": 698,
-  "j8_hero_lost_units_naive": 280,
-  "j8_hero_units_pre_ew": 319,
+  "j8_hero_units_pre": 675,
+  "j8_hero_lost_units_naive": 272,
+  "j8_hero_units_pre_ew": 306,
   "j8_hero_units_oos_ew": 0,
   "j8_sale_uplift_ns": 2.04,
-  "j8_hero_lost_units_est": 260,
-  "j8_hero_asp_ex": 1278.35,
-  "j8_hero_lost_revenue_est": 332371,
-  "j8_hero_lost_revenue_naive": 357938,
+  "j8_hero_lost_units_est": 250,
+  "j8_hero_asp_ex": 1277.75,
+  "j8_hero_lost_revenue_est": 319438,
+  "j8_hero_lost_revenue_naive": 347548,
   "j8_hero_views_oos": 15789,
   "j8_hero_views_pre": 17148,
   "j8_phantom_hero_rows_aug": 20,
   "j8_hero_oos_rows_ew": 192,
-  "j8_hero_units_oos": 309,
+  "j8_hero_units_oos": 301,
   "j8_reserved_trap_rows": 6,
   "j8_blocked_rate": 0.09,
   "j8_hero_fill_wh_east": 0
@@ -499,11 +500,11 @@
       sides: {
         a: ['Growth', 'Customers are cheap. Spend more.', inr(K.j1_blended_cac), 'per new customer', `They divide ad spend by every new customer in the month, including the ${num(K.j1_new_people_marketplace)} who arrived through Amazon, Myntra and Flipkart and never saw an ad. Meta's own dashboard says ${K.j1_meta_roas_claimed.toFixed(0)}× return.`],
         b: ['Finance', 'Payback does not add up. Spend less.', inr(K.j1_paid_cac_delivered), 'per new customer who received an order', `They count only people whose first order came from an ad and was actually delivered. One in five paid first orders came back undelivered; those customers cost money and produced nothing.`],
-        verdict: `Both are arithmetic on the same month. <b>Neither is wrong; each answers a different question.</b> The budget question needs the cost of a paid customer, counted the same way as last month, so the trend is visible.`,
+        verdict: `Same month, same tables. <b>The budget question needs the cost of a paid customer, counted the same way as July.</b> That is ${inr(K.j1_paid_cac)}, and it rose.`,
       },
       journey: {
         title: 'The journey. Spend goes out on one day; a customer exists only when a first order is placed.',
-        sub: 'Each bar is the previous bar, split. Blue is the population we chose. Grey leaves the flow.',
+        sub: 'Each bar is the one above it, split. Blue is what we count.',
         max: K.j1_new_ids_raw,
         stages: [
           ['New customer rows', 'customers table, first order in Aug', [['New customer_ids', K.j1_new_ids_raw, 'mid']]],
@@ -513,7 +514,7 @@
         ],
       },
       forks: {
-        title: 'Six forks. Each one moves the number, and the room will land on different ones.',
+        title: 'Six forks.',
         rows: [
           ['What is spend', [['Every row in the ad export', L(K.j1_paid_spend_naive)], ['Latest report per day; restated days counted once', L(K.j1_paid_spend)]], 1],
           ['Who is new', [['A new customer_id', num(K.j1_new_ids_raw)], ['A new person, by email or phone', num(K.j1_new_all_customers)]], 1],
@@ -524,8 +525,8 @@
         ],
       },
       numbers: {
-        title: 'Four numbers the room brings. A factor of four between highest and lowest.',
-        sub: 'Each is arithmetic on the same tables. The label tells you which forks were taken.',
+        title: 'Four numbers the room will bring.',
+        sub: '',
         rows: [
           ['Growth', 'Blended CAC', 'All spend / all new people, marketplace included', inr(K.j1_blended_cac), K.j1_blended_cac],
           ['First attempt', 'Naive paid CAC', 'Every ad row summed / new paid customer_ids', inr(K.j1_paid_cac_naive), K.j1_paid_cac_naive],
@@ -570,7 +571,7 @@
       sides: {
         a: ['Product', 'The site got worse. Fix the checkout.', delta(K.j2_cvr_all, K.j2_jul_cvr_all), `sessions to orders, Jul ${pct(K.j2_jul_cvr_all, 2)} → Aug ${pct(K.j2_cvr_all, 2)}`, 'The analytics dashboard divides orders by every session it recorded. Bots and staff sessions are in the denominator, and there were more of them in August.'],
         b: ['Marketing', 'The site is fine. The traffic changed.', pp(K.j2_paid_session_share, K.j2_paid_session_share_jul), `paid share of real sessions, ${pct(K.j2_paid_session_share_jul, 0)} → ${pct(K.j2_paid_session_share, 0)}`, 'The sale pulled in more paid, lower-intent traffic. Bargain hunters browse more and buy less; the same site converting a different crowd will look worse.'],
-        verdict: `Both true. <b>Remove bots and staff, hold traffic type constant, and conversion still fell.</b> Paid traffic on its own converted ${delta(K.j2_cvr_paid, K.j2_cvr_paid_jul)} worse; checkout completion fell ${delta(K.j2_checkout_completion, K.j2_jul_checkout_completion)}. Something changed at checkout, and the sale is not the whole story.`,
+        verdict: `<b>Remove bots and staff, hold traffic type constant: conversion still fell.</b> Paid traffic alone converted ${delta(K.j2_cvr_paid, K.j2_cvr_paid_jul)}; checkout completion fell ${delta(K.j2_checkout_completion, K.j2_jul_checkout_completion)}.`,
       },
       journey: {
         title: 'The journey. Not every session is a person, and the ones that are did not all come the same way.',
@@ -594,8 +595,8 @@
         ],
       },
       numbers: {
-        title: 'Four ways to say "conversion fell". They agree on direction, not on size or cause.',
-        sub: 'Bars show the size of the fall.',
+        title: 'Four ways to say "conversion fell".',
+        sub: '',
         rows: [
           ['Analytics dashboard', 'All sessions', `Jul ${pct(K.j2_jul_cvr_all, 2)} → Aug ${pct(K.j2_cvr_all, 2)}; bots inside`, delta(K.j2_cvr_all, K.j2_jul_cvr_all), Math.abs(K.j2_cvr_all - K.j2_jul_cvr_all) / K.j2_jul_cvr_all],
           ['Our definition', 'Real sessions', `Jul ${pct(K.j2_jul_cvr_eligible, 2)} → Aug ${pct(K.j2_cvr_eligible, 2)}`, delta(K.j2_cvr_eligible, K.j2_jul_cvr_eligible), Math.abs(K.j2_cvr_eligible - K.j2_jul_cvr_eligible) / K.j2_jul_cvr_eligible, true],
@@ -640,7 +641,7 @@
       sides: {
         a: ['Operations', 'Nine in ten. Delivery is fine.', pct(K.j3_ontime_dashboard, 0), 'shipped within 3 days of order', `Their dashboard measures the door they control: the parcel leaving the warehouse. ${num(K.j3_backdated_shipped)} shipped scans in August were backdated, which flatters it further.`],
         b: ['Customer service', 'The inbox says otherwise.', `${num(K.j6_aug_delivery_delay)}`, `"where is my order" tickets in Aug, up from ${num(K.j6_jul_delivery_delay)}`, 'They see the door the customer feels: the parcel arriving after the promised date. They have no rate, only a rising count.'],
-        verdict: `Both are looking at real data. <b>The courier question is about the promised date, not the ship date.</b> Measured at the customer's door, ${pct(K.j3_edd_hit_placed, 0)} of delivered August orders arrived by the date we promised. One warehouse and one courier explain most of the miss.`,
+        verdict: `<b>The courier question is about the promised date, not the ship date.</b> ${pct(K.j3_edd_hit_placed, 0)} of delivered August orders arrived by the date promised. One warehouse and one courier account for most of the miss.`,
       },
       journey: {
         title: 'The journey. Every August order ends in one of four states, and "on time" is only defined for one of them.',
@@ -665,8 +666,8 @@
         ],
       },
       numbers: {
-        title: 'Four numbers, from nine in ten to seven in ten. Each is a true count of a different door.',
-        sub: 'The courier negotiation needs the third.',
+        title: 'Four numbers, from nine in ten to seven in ten.',
+        sub: '',
         rows: [
           ['Operations dashboard', 'Shipped within 3 days', `Recorded shipped_date; ${num(K.j3_backdated_shipped)} scans backdated`, pct(K.j3_ontime_dashboard, 0), K.j3_ontime_dashboard],
           ['Courier', 'First attempt by promised date', 'Customer-not-home is not counted against them', pct(K.j3_first_attempt_by_promise, 0), K.j3_first_attempt_by_promise],
@@ -709,9 +710,9 @@
              "I can't judge that without the first number. One rupee figure for August. Tell me what you counted as a return, what as a cost, and what you left out. If there are things that look like returns but aren't, tell me how you treated them."],
       decision: 'Tighten the return policy, or leave it.', stake: 'Return-driven cost against the customers a harder policy turns away.',
       sides: {
-        a: ['Finance', 'Returns are bleeding us. Tighten the policy.', L(K.j4_refunds_total_req), 'refunded in August', 'They read the refund column. It is the biggest number in the reverse flow. But a refund is revenue handed back, and it is already out of net revenue; adding it again counts it twice.'],
+        a: ['Finance', 'Returns cost too much. Tighten the policy.', L(K.j4_refunds_total_req), 'refunded in August', 'They read the refund column. It is the biggest number in the reverse flow. But a refund is revenue handed back, and it is already out of net revenue; adding it again counts it twice.'],
         b: ['Brand', 'Returns are the cost of selling online.', L(K.j4_revfee_total_req), 'reverse pick-up fees', 'They read the courier fee column. It is the smallest number in the reverse flow, and it leaves out the forward shipping we paid on parcels that came back, the gateway fees nobody refunds, and the goods that came back damaged.'],
-        verdict: `<b>Neither number is the cost of returns.</b> The cash cost is ${L(K.j4_out_of_pocket)}. Two-thirds of it sits on parcels the customer refused at the door; a shorter return window does nothing to those. The policy touches about ${L(j4_customer_side)}.`,
+        verdict: `<b>Neither number is the cost of returns.</b> The cash cost is ${L(K.j4_out_of_pocket)}. Two-thirds of it is on parcels refused at the door, which the return policy does not reach.`,
       },
       journey: {
         title: 'The journey. Four things look like a return. The policy governs two of them, and the money moves differently in each.',
@@ -736,8 +737,8 @@
         ],
       },
       numbers: {
-        title: 'Four numbers, from two lakh to fourteen. The largest is not a cost; the smallest is a fifth of it.',
-        sub: 'The policy decision needs the third.',
+        title: 'Four numbers, from two lakh to fourteen.',
+        sub: '',
         rows: [
           ['Finance, first pass', 'Refunds paid', 'Money handed back; revenue reversed, not spent', L(K.j4_refunds_total_req), K.j4_refunds_total_req],
           ['Brand', 'Reverse pick-up fees', 'Courier fee to bring parcels back, all four flows', L(K.j4_revfee_total_req), K.j4_revfee_total_req],
@@ -782,7 +783,7 @@
       sides: {
         a: ['Growth dashboard', 'Two in five. We are an acquisition brand.', pct(K.j5_repeat_share_placed_all, 0), 'of everything placed in Aug, by customer_id', 'The dashboard divides by every order placed, GST and cancellations included, and calls a customer new whenever the login is new. Guest checkouts and re-registrations all look new.'],
         b: ['Founder', 'More than half. Repeat-led.', pct(K.j5_repeat_rev_share, 0), 'of delivered sales, by person', `Match customers by email and phone and ${num(K.j5_hidden_repeat_orders)} August orders on "new" ids belong to people who bought before. Delivered sales, not orders placed, is the base.`],
-        verdict: `<b>Half.</b> ${pct(K.j5_repeat_rev_share_naive, 0)} if you trust customer_id, ${pct(K.j5_repeat_rev_share, 0)} if you match people. July was ${pct(K.j5_jul_repeat_rev_share, 0)}; the sale brought first-timers. "Repeat-led" is defensible as "half", not as "most".`,
+        verdict: `<b>Half.</b> ${pct(K.j5_repeat_rev_share_naive, 0)} by customer_id, ${pct(K.j5_repeat_rev_share, 0)} by person. July was ${pct(K.j5_jul_repeat_rev_share, 0)}.`,
       },
       journey: {
         title: 'The journey. A repeat customer is a person who bought before. The data has logins, not people.',
@@ -806,7 +807,7 @@
         ],
       },
       numbers: {
-        title: 'Four numbers between 28% and 51%. Three answer a different question. One is honest and needs a caveat.',
+        title: 'Four numbers between 28% and 51%.',
         sub: '',
         rows: [
           ['Growth dashboard', 'Repeat share of everything placed', 'Incl GST, cancelled and RTO; by customer_id', pct(K.j5_repeat_share_placed_all, 0), K.j5_repeat_share_placed_all],
@@ -852,7 +853,7 @@
       sides: {
         a: ['The floor', 'Complaints are up. The new system broke something.', delta(K.j6_tickets_naive, K.j6_jul_tickets_naive), `tickets, ${num(K.j6_jul_tickets_naive)} → ${num(K.j6_tickets_naive)}`, 'They count rows in the ticket table. August has more rows. Some are reopened threads the new system logs as fresh tickets; some are questions, not complaints.'],
         b: ['Head of CS', 'The numbers look fine. We shipped more.', delta(K.j6_delivered_aug, K.j6_delivered_jul), `delivered orders, ${num(K.j6_delivered_jul)} → ${num(K.j6_delivered_aug)}`, 'They divide by volume and get a flat-looking rate. But July is inflated by a week when both helpdesks logged the same tickets, which hides part of the August rise.'],
-        verdict: `<b>Real, and not the helpdesk's doing.</b> Complaints per 100 delivered orders rose ${delta(K.j6_complaints_per_100_aug, K.j6_complaints_per_100_jul)} after removing reopens, cutover duplicates and growth. The rise is in delivery delays and wrong items, which point at fulfilment, not support.`,
+        verdict: `<b>Real, and not caused by the helpdesk.</b> Complaints per 100 delivered orders rose ${delta(K.j6_complaints_per_100_aug, K.j6_complaints_per_100_jul)} after removing reopens, cutover duplicates and growth. The rise is delivery delays and wrong items.`,
       },
       journey: {
         title: 'The journey. One problem can become several tickets, and not every ticket is a complaint.',
@@ -876,8 +877,8 @@
         ],
       },
       numbers: {
-        title: 'Four numbers, all "up". The size is what matters, and the kind.',
-        sub: 'Bars show the size of the rise.',
+        title: 'Four numbers, all up.',
+        sub: '',
         rows: [
           ['The floor', 'All tickets', `${num(K.j6_jul_tickets_naive)} → ${num(K.j6_tickets_naive)}`, delta(K.j6_tickets_naive, K.j6_jul_tickets_naive), Math.abs(K.j6_tickets_naive - K.j6_jul_tickets_naive) / K.j6_jul_tickets_naive],
           ['Cleaned', 'Tickets, no reopens or duplicates', `${num(K.j6_jul_tickets_dedup)} → ${num(K.j6_tickets_dedup_aug)}`, delta(K.j6_tickets_dedup_aug, K.j6_jul_tickets_dedup), Math.abs(K.j6_tickets_dedup_aug - K.j6_jul_tickets_dedup) / K.j6_jul_tickets_dedup],
@@ -922,7 +923,7 @@
       sides: {
         a: ['Marketing', 'The sale was planned. Margin held.', pct(K.j7_cm1_v1, 0), 'gross margin at the old standard cost', 'Their number uses cost v1, the standard cost the last board pack used. It looks almost flat against last quarter. But a costing review raised every unit cost from 1 July, and v1 no longer describes what the goods cost.'],
         b: ['Finance', 'Margin fell four points. The sale was expensive.', pct(K.j7_cm1_v2, 0), 'gross margin at the revised cost', `Same sales, cost v2. The ${pct(K.j7_cost_v2_uplift_pct, 0)} cost revision explains most of the gap to Marketing's number, not the sale. Against July on the same cost basis, the sale cost ${pp(K.j7_cm1_v2, K.j7_jul_cm1_v2).replace('−', '')}.`],
-        verdict: `<b>Same sales, two cost tables.</b> Gross margin at current cost is ${pct(K.j7_cm1_v2, 1)}, ${pct(K.j7_gm_after_returns_pct, 1)} after August's returns. Against July on the same cost basis the sale cost ${pp(K.j7_cm1_v2, K.j7_jul_cm1_v2).replace('−', '')}; the rest of the fall versus the old pack is the cost revision.`,
+        verdict: `<b>Same sales, two cost tables.</b> Gross margin at current cost is ${pct(K.j7_cm1_v2, 1)}; ${pct(K.j7_gm_after_returns_pct, 1)} after August returns. Against July on the same cost basis the sale cost ${pp(K.j7_cm1_v2, K.j7_jul_cm1_v2).replace('−', '')}.`,
       },
       journey: {
         title: 'The journey. From list price to what we keep, in six cuts. Two of them are choices, not facts.',
@@ -948,8 +949,8 @@
         ],
       },
       numbers: {
-        title: 'Five margins between 35% and 70%. Every one is called "margin" by someone in the building.',
-        sub: 'The board pack needs the fourth, with the fifth beside it.',
+        title: 'Five margins between 35% and 70%.',
+        sub: '',
         rows: [
           ['Merchandising', 'Margin on list price', 'MRP less cost; ignores discounts', pct(K.j7_gm_pct_mrp_v2, 0), K.j7_gm_pct_mrp_v2],
           ['Growth dashboard', 'Margin on price incl GST', 'Treats GST as revenue', pct(K.j7_gm_pct_incl_gst_v2, 0), K.j7_gm_pct_incl_gst_v2],
@@ -993,9 +994,9 @@
              "One rupee figure for lost sales. Tell me how you worked out what we'd have sold had the products been in stock, how you separated that from what we'd never have sold anyway, and how much of it is estimate rather than fact."],
       decision: 'Fund a much larger safety stock on hero products, or not.', stake: 'Cash tied up in inventory every month, against four days of lost sales once.',
       sides: {
-        a: ['Supply chain', 'We lost a fortune. Hold more stock.', L(K.j8_hero_lost_revenue_naive), `${num(K.j8_hero_lost_units_naive)} units, company run rate × 4 days`, 'They take the pre-sale daily rate across all four warehouses and multiply by the days out. But only two warehouses ran out; North and South kept selling, and sold more because of the sale.'],
-        b: ['Finance', 'It is an estimate. Prove it before funding.', L(K.j8_hero_lost_revenue_est * K.j7_cm1_v2 / 100), 'at gross margin, not at price', 'A lost sale costs the margin on it, not the price, and some shoppers bought something else. They are right about margin and right that substitution is unknown; wrong if they use it to say the loss was small.'],
-        verdict: `<b>The stock-out is a fact; its cost is a counterfactual.</b> About ${num(K.j8_hero_lost_units_est)} units and ${L(K.j8_hero_lost_revenue_est)} of sales at the two warehouses that ran out, using the other two as the control for what the sale would have done. Demand was there: hero page views barely dipped.`,
+        a: ['Supply chain', 'The stock-out was expensive. Hold more stock.', L(K.j8_hero_lost_revenue_naive), `${num(K.j8_hero_lost_units_naive)} units, company run rate × 4 days`, 'They take the pre-sale daily rate across all four warehouses and multiply by the days out. But only two warehouses ran out; North and South kept selling, and sold more because of the sale.'],
+        b: ['Finance', 'It is an estimate. Check it before funding.', L(K.j8_hero_lost_revenue_est * K.j7_cm1_v2 / 100), 'at gross margin, not at price', 'A lost sale costs the margin on it, not the price, and some shoppers bought something else. They are right about margin and right that substitution is unknown; wrong if they use it to say the loss was small.'],
+        verdict: `<b>The stock-out is a fact; its cost is an estimate.</b> About ${num(K.j8_hero_lost_units_est)} units, ${L(K.j8_hero_lost_revenue_est)}, at the two warehouses that ran out. Hero page views barely dipped.`,
       },
       journey: {
         title: 'The journey. Lost sales are never in the data. They are the gap between what happened and what should have.',
@@ -1020,7 +1021,7 @@
         ],
       },
       numbers: {
-        title: 'Three numbers. All estimates. One is honest about what it borrows.',
+        title: 'Three numbers. All estimates.',
         sub: '',
         rows: [
           ['Supply chain', 'Naive lost sales', `Company run rate × 4 days; ${num(K.j8_hero_lost_units_naive)} units incl. warehouses that kept selling`, L(K.j8_hero_lost_revenue_naive), K.j8_hero_lost_revenue_naive],
@@ -1067,7 +1068,7 @@
   add(`<section class="slide center">
     <div class="cover">
       <div>
-        <h1>Eight questions. Eight numbers you can defend.</h1>
+        <h1>Eight questions. Eight answers.</h1>
         <div class="cover-meta"><span>Decision Makers Club · Session 01</span><span>Answer keys, shown after the teams present</span></div>
       </div>
       <div class="block"></div>
@@ -1076,7 +1077,7 @@
   </section>`);
 
   add(`<section class="slide">
-    <h2>Each pack, seven slides. The same seven steps as revenue.<small>The number at the end is one defensible answer, not the only one. A team that chose differently and said why has done the work.</small></h2>
+    <h2>Each pack, seven slides. Same steps as the revenue example.<small>The answer at the end is one defensible number, not the only one. A team that chose differently and said why has done the work.</small></h2>
     <div class="body"><div class="tiles">
       <div class="tile"><span class="n">01 · 02</span><b>The message, and who believes what<small>The CEO's note, the decision it serves, and the two numbers already in the room, each with the reason its owner trusts it.</small></b></div>
       <div class="tile"><span class="n">03</span><b>The journey as it really happens<small>Not a line: a flow that splits. Each bar is the one above it, cut where the business forks.</small></b></div>
@@ -1110,7 +1111,7 @@
     const S = p.sides;
     const side = s => `<div class="side"><span class="who">${s[0]}</span><p class="claim">${s[1]}</p><div class="num">${s[2]}<small>${s[3]}</small></div><p class="why">${s[4]}</p></div>`;
     add(`<section class="slide">${mark(p)}
-      <h2>Two numbers are already in the room. Both are honest arithmetic.</h2>
+      <h2>Two numbers are already in the room.</h2>
       <div class="body"><div class="sides">${side(S.a)}${side(S.b)}<div class="verdict">${S.verdict}</div></div></div>
       ${step('Step 1 · Why the room disagrees')}<span class="pg"></span></section>`);
 
@@ -1135,7 +1136,7 @@
     // 4. forks with consequences
     const F = p.forks;
     add(`<section class="slide">${mark(p)}
-      <h2>${F.title}<small>Each option carries the number you get by taking it. Bold is what we chose.</small></h2>
+      <h2>${F.title}<small>Each option shows the number it produces. Bold is our choice.</small></h2>
       <div class="body"><div class="forks">
         ${F.rows.map((r, i) => `<div class="fork"><span class="n">0${i + 1}</span><span class="k">${r[0]}</span>
           <span class="opts">${r[1].map((o, k) => `<span class="opt ${k === r[2] ? 'on' : ''}"><span>${o[0]}</span><b>${o[1] || ''}</b></span>`).join('')}</span></div>`).join('')}
@@ -1156,34 +1157,32 @@
     // 6. definition
     add(`<section class="slide">${mark(p)}
       <h2>The definition. Seven lines anyone can recompute.</h2>
-      <div class="body"><div class="defs">
+      <div class="body"><div class="defwrap"><div class="defs">
         ${p.def.map((d, i) => `<div class="def"><span class="n">0${i + 1}</span><span class="k">${d[0]}</span><span class="v">${d[1]}<small>${d[2]}</small></span></div>`).join('')}
-      </div></div>
+      </div>
+      <div class="checklist" style="margin-top:0"><span class="hd">Checked against</span>
+        ${p.concl.checks.map(c => `<div><span>${c[0]}</span><span>${c[1]}</span></div>`).join('')}
+      </div></div></div>
       ${step('Step 5 · Definition')}<span class="pg"></span></section>`);
 
     // 7. answer
     const C = p.concl;
     add(`<section class="slide">${mark(p)}
-      <h2>The answer, what to say, and what it does not prove.</h2>
+      <h2>The answer.</h2>
       <div class="body"><div class="concl">
         <div>
           <div class="bignum"><span class="k">${C.k}</span><span class="v">${C.v}</span><span class="d">${C.d}</span></div>
           <div class="tell">${C.tell}</div>
         </div>
-        <div>
-          <div class="checklist" style="margin-top:0"><span class="hd">Checked against</span>
-            ${C.checks.map(c => `<div><span>${c[0]}</span><span>${c[1]}</span></div>`).join('')}
-          </div>
-          <div class="limits" style="margin-top:36px"><span class="k">What this number does not prove</span>
-            ${C.limits.map(l => `<p>${l}</p>`).join('')}
-          </div>
+        <div class="limits"><span class="k">What this number does not prove</span>
+          ${C.limits.map(l => `<p>${l}</p>`).join('')}
         </div>
       </div></div>
       ${step('Steps 6 and 7 · Check, conclude')}<span class="pg"></span></section>`);
   });
 
   add(`<section class="slide">
-    <h2>What the eight packs have in common.<small>Every wrong number in this room was a right number for a different question.</small></h2>
+    <h2>What the eight packs have in common.</h2>
     <div class="body"><div class="tiles">
       <div class="tile"><span class="n">01</span><b>Two tables, one truth<small>ids vs people; scan date vs actual; cost v1 vs v2; two helpdesks. The data never says which is right. The decision does.</small></b></div>
       <div class="tile"><span class="n">02</span><b>The window is a choice<small>Placed, delivered, requested, refunded. Pick the event that matches the decision and say which one you picked.</small></b></div>
